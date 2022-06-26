@@ -2,23 +2,41 @@ import 'dart:html';
 import 'package:flutter/material.dart';
 import 'package:techme/connexion.dart';
 import 'package:techme/main.dart';
+import 'package:techme/models/assure.dart';
 import 'package:techme/reclamation.dart';
 import 'package:techme/inscription.dart';
+import 'package:techme/services/api_service.dart';
 
 //import 'dart:async';
 
 void main() {
-  runApp(MaterialApp(home: assurance()));
+  runApp(const MaterialApp(home: Assurance()));
 }
 
-class assurance extends StatefulWidget {
+class Assurance extends StatefulWidget {
+  const Assurance({Key? key}) : super(key: key);
+
   @override
   _State createState() => _State();
 }
 
-class _State extends State<assurance> {
-  void _enregistrer() {}
-  void _charger_cacher_signature() {}
+class _State extends State<Assurance> {
+  bool loading = false;
+  DateTime dateNaissance = DateTime.now();
+  AssureModel assureModel = AssureModel();
+
+  Future<void> _selectDateNaissance(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+        context: context,
+        initialDate: dateNaissance,
+        firstDate: DateTime(1970, 8),
+        lastDate: DateTime(2050));
+    if (picked != null && picked != dateNaissance) {
+      setState(() {
+        dateNaissance = picked;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,10 +52,10 @@ class _State extends State<assurance> {
                     MaterialPageRoute(builder: (context) => MyApp()),
                   );
                 },
-                child: Text('Acceuil',
+                child: const Text('Acceuil',
                     style: TextStyle(color: Colors.white, fontSize: 17)),
               ),
-              SizedBox(
+              const SizedBox(
                 width: 15,
                 height: 10,
               ),
@@ -48,10 +66,10 @@ class _State extends State<assurance> {
                     MaterialPageRoute(builder: (context) => inscription()),
                   );
                 },
-                child: Text('Inscription',
+                child: const Text('Inscription',
                     style: TextStyle(color: Colors.white, fontSize: 17)),
               ),
-              SizedBox(
+              const SizedBox(
                 width: 15,
               ),
               OutlinedButton(
@@ -61,18 +79,18 @@ class _State extends State<assurance> {
                     MaterialPageRoute(builder: (context) => reclamation()),
                   );
                 },
-                child: Text('Réclamaton',
+                child: const Text('Réclamaton',
                     style: TextStyle(color: Colors.white, fontSize: 17)),
               ),
-              SizedBox(
+              const SizedBox(
                 width: 15,
               ),
-              OutlinedButton(
+              const OutlinedButton(
                 onPressed: null,
                 child: Text('A propos',
                     style: TextStyle(color: Colors.white, fontSize: 17)),
               ),
-              SizedBox(
+              const SizedBox(
                 width: 15,
               ),
               OutlinedButton(
@@ -85,16 +103,16 @@ class _State extends State<assurance> {
                 style: ButtonStyle(
                   backgroundColor: MaterialStateProperty.all(Colors.white),
                 ),
-                child: Text('Connexion',
+                child: const Text('Connexion',
                     style: TextStyle(color: Color(0xFF4695CD), fontSize: 17)),
               ),
-              SizedBox(
+              const SizedBox(
                 width: 30,
               ),
             ],
           )
         ],
-        backgroundColor: Color(0xFF4695CD),
+        backgroundColor: const Color(0xFF4695CD),
         shadowColor: Colors.transparent,
       ),
       body: Container(
@@ -109,11 +127,11 @@ class _State extends State<assurance> {
                   // Titre de page
                   Row(
                     children: [
-                      SizedBox(
+                      const SizedBox(
                         height: 200,
                         width: 560,
                       ),
-                      SizedBox(
+                      const SizedBox(
                         width: 210,
                         child: Text(
                           'Déclaration et demande d assurance',
@@ -124,7 +142,7 @@ class _State extends State<assurance> {
                           textAlign: TextAlign.center,
                         ),
                       ),
-                      SizedBox(
+                      const SizedBox(
                         width: 400,
                       ),
                       Image.asset(
@@ -141,35 +159,40 @@ class _State extends State<assurance> {
                   ),
 
                   Row(children: [
-                    SizedBox(
+                    const SizedBox(
                       width: 270,
                     ),
                     Container(
                       decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(30),
                           border: Border.all(
-                              color: Color.fromARGB(255, 185, 185, 185))),
+                              color: const Color.fromARGB(255, 185, 185, 185))),
                       height: 120,
                       width: 800,
                       child: Column(
                         children: [
-                          SizedBox(
+                          const SizedBox(
                             height: 20,
                           ),
-                          Text(
+                          const Text(
                             'Numéro d immatriculation',
                             style: TextStyle(
                                 color: Colors.orange,
                                 fontWeight: FontWeight.w700,
                                 fontSize: 18),
                           ),
-                          SizedBox(
+                          const SizedBox(
                             width: 100,
                           ),
                           SizedBox(
                             width: 500,
-                            child: TextField(
+                            child: TextFormField(
                               textAlign: TextAlign.center,
+                              onChanged: (val) {
+                                setState(() {
+                                  assureModel.nss = val;
+                                });
+                              },
                             ),
                           ),
                           SizedBox(
@@ -183,7 +206,7 @@ class _State extends State<assurance> {
                   // section 3 employeur
 
                   Row(
-                    children: [
+                    children: const [
                       SizedBox(
                         width: 450,
                         height: 80,
@@ -202,24 +225,25 @@ class _State extends State<assurance> {
                     height: 30,
                   ),
                   Row(children: [
-                    SizedBox(
+                    const SizedBox(
                       width: 270,
                     ),
                     Container(
                         decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(30),
                             border: Border.all(
-                                color: Color.fromARGB(255, 185, 185, 185))),
+                                color:
+                                    const Color.fromARGB(255, 185, 185, 185))),
                         width: 800,
                         height: 420,
                         child: Column(children: [
-                          SizedBox(
+                          const SizedBox(
                             width: 400,
                           ),
                           SizedBox(
                               width: 150,
                               child: Column(
-                                children: [
+                                children: const [
                                   TextField(textAlign: TextAlign.center),
                                   SizedBox(
                                     height: 20,
@@ -232,13 +256,13 @@ class _State extends State<assurance> {
                                           fontSize: 15)),
                                 ],
                               )),
-                          SizedBox(
+                          const SizedBox(
                             height: 50,
                           ),
-                          Text(
+                          const Text(
                               'L’employeur ou l’organisme assimilé soussigné (Nom, Prénom, ou raison social)'),
                           Row(
-                            children: [
+                            children: const [
                               SizedBox(
                                 width: 50,
                               ),
@@ -254,7 +278,7 @@ class _State extends State<assurance> {
                             ],
                           ),
                           Row(
-                            children: [
+                            children: const [
                               SizedBox(
                                 width: 50,
                               ),
@@ -267,7 +291,7 @@ class _State extends State<assurance> {
                             ],
                           ),
                           Row(
-                            children: [
+                            children: const [
                               SizedBox(
                                 width: 150,
                               ),
@@ -286,27 +310,27 @@ class _State extends State<assurance> {
                               ),
                             ],
                           ),
-                          SizedBox(
+                          const SizedBox(
                             height: 50,
                             width: 250,
                           ),
                           ElevatedButton(
-                            onPressed: _charger_cacher_signature,
-                            child: Text(
-                              'Charger le cachet avec signature',
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 15),
-                            ),
+                            onPressed: null,
                             style: ElevatedButton.styleFrom(
-                              primary: Color(0xFF4695CD),
+                              primary: const Color(0xFF4695CD),
                               padding: const EdgeInsets.symmetric(
                                   horizontal: 100, vertical: 20),
                               shape: RoundedRectangleBorder(
                                 borderRadius:
                                     BorderRadius.circular(20), // <-- Radius
                               ),
+                            ),
+                            child: const Text(
+                              'Charger le cachet avec signature',
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 15),
                             ),
                           ),
                         ]))
@@ -315,7 +339,7 @@ class _State extends State<assurance> {
                   // renseignement de l'assuré
 
                   Row(
-                    children: [
+                    children: const [
                       SizedBox(
                         width: 525,
                         height: 80,
@@ -342,19 +366,20 @@ class _State extends State<assurance> {
                         decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(30),
                             border: Border.all(
-                                color: Color.fromARGB(255, 185, 185, 185))),
+                                color:
+                                    const Color.fromARGB(255, 185, 185, 185))),
                         width: 800,
                         height: 800,
                         child: Column(children: [
-                          SizedBox(
+                          const SizedBox(
                             height: 10,
                           ),
                           Row(
                             children: [
-                              SizedBox(
+                              const SizedBox(
                                 width: 60,
                               ),
-                              SizedBox(
+                              const SizedBox(
                                 width: 180,
                                 child: Text(
                                   'Nom',
@@ -365,18 +390,23 @@ class _State extends State<assurance> {
                               ),
                               SizedBox(
                                 width: 500,
-                                child: TextField(
+                                child: TextFormField(
                                   textAlign: TextAlign.center,
+                                  onChanged: (val) {
+                                    setState(() {
+                                      assureModel.nom = val;
+                                    });
+                                  },
                                 ),
                               ),
                             ],
                           ),
                           Row(
                             children: [
-                              SizedBox(
+                              const SizedBox(
                                 width: 60,
                               ),
-                              SizedBox(
+                              const SizedBox(
                                 width: 180,
                                 child: Text(
                                   'Prenom',
@@ -387,18 +417,23 @@ class _State extends State<assurance> {
                               ),
                               SizedBox(
                                 width: 500,
-                                child: TextField(
+                                child: TextFormField(
                                   textAlign: TextAlign.center,
+                                  onChanged: (val) {
+                                    setState(() {
+                                      assureModel.prenom = val;
+                                    });
+                                  },
                                 ),
                               ),
                             ],
                           ),
                           Row(
                             children: [
-                              SizedBox(
+                              const SizedBox(
                                 width: 60,
                               ),
-                              SizedBox(
+                              const SizedBox(
                                 width: 180,
                                 child: Text(
                                   'Nom de l epoux',
@@ -409,18 +444,26 @@ class _State extends State<assurance> {
                               ),
                               SizedBox(
                                 width: 500,
-                                child: TextField(
+                                child: TextFormField(
                                   textAlign: TextAlign.center,
+                                  onChanged: (val) {
+                                    setState(() {
+                                      assureModel.nom_epoux = val;
+                                    });
+                                  },
                                 ),
                               ),
                             ],
                           ),
+                          const SizedBox(
+                            height: 10,
+                          ),
                           Row(
                             children: [
-                              SizedBox(
+                              const SizedBox(
                                 width: 60,
                               ),
-                              SizedBox(
+                              const SizedBox(
                                 width: 180,
                                 child: Text(
                                   'Date de naissance',
@@ -431,18 +474,36 @@ class _State extends State<assurance> {
                               ),
                               SizedBox(
                                 width: 150,
-                                child: TextField(
-                                  textAlign: TextAlign.center,
+                                child: ElevatedButton(
+                                  onPressed: () async {
+                                    await _selectDateNaissance(context);
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    primary: Colors.orange,
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 40, vertical: 10),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(
+                                          20), // <-- Radius
+                                    ),
+                                  ),
+                                  child: Text(
+                                    "${dateNaissance.toLocal()}".split(' ')[0],
+                                    style: const TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: 13),
+                                  ),
                                 ),
                               ),
                             ],
                           ),
                           Row(
                             children: [
-                              SizedBox(
+                              const SizedBox(
                                 width: 60,
                               ),
-                              SizedBox(
+                              const SizedBox(
                                 width: 180,
                                 child: Text(
                                   'Lieu de naissance',
@@ -453,18 +514,23 @@ class _State extends State<assurance> {
                               ),
                               SizedBox(
                                 width: 500,
-                                child: TextField(
+                                child: TextFormField(
                                   textAlign: TextAlign.center,
+                                  onChanged: (val) {
+                                    setState(() {
+                                      assureModel.lieu_naissance = val;
+                                    });
+                                  },
                                 ),
                               ),
                             ],
                           ),
                           Row(
                             children: [
-                              SizedBox(
+                              const SizedBox(
                                 width: 60,
                               ),
-                              SizedBox(
+                              const SizedBox(
                                 width: 180,
                                 child: Text(
                                   'Commune de naissance',
@@ -475,18 +541,23 @@ class _State extends State<assurance> {
                               ),
                               SizedBox(
                                 width: 500,
-                                child: TextField(
+                                child: TextFormField(
                                   textAlign: TextAlign.center,
+                                  onChanged: (val) {
+                                    setState(() {
+                                      assureModel.commune_naissance = val;
+                                    });
+                                  },
                                 ),
                               ),
                             ],
                           ),
                           Row(
                             children: [
-                              SizedBox(
+                              const SizedBox(
                                 width: 60,
                               ),
-                              SizedBox(
+                              const SizedBox(
                                 width: 180,
                                 child: Text(
                                   'Wilaya de naissance',
@@ -497,18 +568,23 @@ class _State extends State<assurance> {
                               ),
                               SizedBox(
                                 width: 500,
-                                child: TextField(
+                                child: TextFormField(
                                   textAlign: TextAlign.center,
+                                  onChanged: (val) {
+                                    setState(() {
+                                      assureModel.wilaya_naissance = val;
+                                    });
+                                  },
                                 ),
                               ),
                             ],
                           ),
                           Row(
                             children: [
-                              SizedBox(
+                              const SizedBox(
                                 width: 60,
                               ),
-                              SizedBox(
+                              const SizedBox(
                                 width: 180,
                                 child: Text(
                                   'Prénom du père',
@@ -519,18 +595,23 @@ class _State extends State<assurance> {
                               ),
                               SizedBox(
                                 width: 500,
-                                child: TextField(
+                                child: TextFormField(
                                   textAlign: TextAlign.center,
+                                  onChanged: (val) {
+                                    setState(() {
+                                      assureModel.prenom_pere = val;
+                                    });
+                                  },
                                 ),
                               ),
                             ],
                           ),
                           Row(
                             children: [
-                              SizedBox(
+                              const SizedBox(
                                 width: 60,
                               ),
-                              SizedBox(
+                              const SizedBox(
                                 width: 180,
                                 child: Text(
                                   'Nom de la mère',
@@ -541,18 +622,23 @@ class _State extends State<assurance> {
                               ),
                               SizedBox(
                                 width: 500,
-                                child: TextField(
+                                child: TextFormField(
                                   textAlign: TextAlign.center,
+                                  onChanged: (val) {
+                                    setState(() {
+                                      assureModel.nom_mere = val;
+                                    });
+                                  },
                                 ),
                               ),
                             ],
                           ),
                           Row(
                             children: [
-                              SizedBox(
+                              const SizedBox(
                                 width: 60,
                               ),
-                              SizedBox(
+                              const SizedBox(
                                 width: 180,
                                 child: Text(
                                   'Prénom de la mère',
@@ -563,18 +649,23 @@ class _State extends State<assurance> {
                               ),
                               SizedBox(
                                 width: 500,
-                                child: TextField(
+                                child: TextFormField(
                                   textAlign: TextAlign.center,
+                                  onChanged: (val) {
+                                    setState(() {
+                                      assureModel.prenom_mere = val;
+                                    });
+                                  },
                                 ),
                               ),
                             ],
                           ),
                           Row(
                             children: [
-                              SizedBox(
+                              const SizedBox(
                                 width: 60,
                               ),
-                              SizedBox(
+                              const SizedBox(
                                 width: 180,
                                 child: Text(
                                   'Sexe',
@@ -585,18 +676,23 @@ class _State extends State<assurance> {
                               ),
                               SizedBox(
                                 width: 150,
-                                child: TextField(
+                                child: TextFormField(
                                   textAlign: TextAlign.center,
+                                  onChanged: (val) {
+                                    setState(() {
+                                      assureModel.sexe = val;
+                                    });
+                                  },
                                 ),
                               ),
                             ],
                           ),
                           Row(
                             children: [
-                              SizedBox(
+                              const SizedBox(
                                 width: 60,
                               ),
-                              SizedBox(
+                              const SizedBox(
                                 width: 180,
                                 child: Text(
                                   'Situation familiale',
@@ -607,18 +703,23 @@ class _State extends State<assurance> {
                               ),
                               SizedBox(
                                 width: 150,
-                                child: TextField(
+                                child: TextFormField(
                                   textAlign: TextAlign.center,
+                                  onChanged: (val) {
+                                    setState(() {
+                                      assureModel.situation_familliale = val;
+                                    });
+                                  },
                                 ),
                               ),
                             ],
                           ),
                           Row(
                             children: [
-                              SizedBox(
+                              const SizedBox(
                                 width: 60,
                               ),
-                              SizedBox(
+                              const SizedBox(
                                 width: 180,
                                 child: Text(
                                   'Nationalité',
@@ -629,18 +730,23 @@ class _State extends State<assurance> {
                               ),
                               SizedBox(
                                 width: 500,
-                                child: TextField(
+                                child: TextFormField(
                                   textAlign: TextAlign.center,
+                                  onChanged: (val) {
+                                    setState(() {
+                                      assureModel.nationalite = val;
+                                    });
+                                  },
                                 ),
                               ),
                             ],
                           ),
                           Row(
                             children: [
-                              SizedBox(
+                              const SizedBox(
                                 width: 60,
                               ),
-                              SizedBox(
+                              const SizedBox(
                                 width: 180,
                                 child: Text(
                                   'Adresse complète',
@@ -651,18 +757,23 @@ class _State extends State<assurance> {
                               ),
                               SizedBox(
                                 width: 500,
-                                child: TextField(
+                                child: TextFormField(
                                   textAlign: TextAlign.center,
+                                  onChanged: (val) {
+                                    setState(() {
+                                      assureModel.adresse_complete = val;
+                                    });
+                                  },
                                 ),
                               ),
                             ],
                           ),
                           Row(
                             children: [
-                              SizedBox(
+                              const SizedBox(
                                 width: 60,
                               ),
-                              SizedBox(
+                              const SizedBox(
                                 width: 180,
                                 child: Text(
                                   'Code postal',
@@ -673,8 +784,13 @@ class _State extends State<assurance> {
                               ),
                               SizedBox(
                                 width: 500,
-                                child: TextField(
+                                child: TextFormField(
                                   textAlign: TextAlign.center,
+                                  onChanged: (val) {
+                                    setState(() {
+                                      assureModel.code_postal = val;
+                                    });
+                                  },
                                 ),
                               ),
                             ],
@@ -687,7 +803,7 @@ class _State extends State<assurance> {
                   // ascendants
 
                   Row(
-                    children: [
+                    children: const [
                       SizedBox(
                         width: 450,
                         height: 80,
@@ -706,22 +822,23 @@ class _State extends State<assurance> {
                     height: 30,
                   ),
                   Row(children: [
-                    SizedBox(
+                    const SizedBox(
                       width: 270,
                     ),
                     Container(
                         decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(30),
                             border: Border.all(
-                                color: Color.fromARGB(255, 185, 185, 185))),
+                                color:
+                                    const Color.fromARGB(255, 185, 185, 185))),
                         width: 800,
                         height: 300,
                         child: Column(children: [
-                          SizedBox(
+                          const SizedBox(
                             height: 15,
                           ),
                           Row(
-                            children: [
+                            children: const [
                               SizedBox(
                                 width: 60,
                               ),
@@ -755,7 +872,7 @@ class _State extends State<assurance> {
                             ],
                           ),
                           Row(
-                            children: [
+                            children: const [
                               SizedBox(
                                 width: 60,
                               ),
@@ -789,7 +906,7 @@ class _State extends State<assurance> {
                             ],
                           ),
                           Row(
-                            children: [
+                            children: const [
                               SizedBox(
                                 width: 60,
                               ),
@@ -823,7 +940,7 @@ class _State extends State<assurance> {
                             ],
                           ),
                           Row(
-                            children: [
+                            children: const [
                               SizedBox(
                                 width: 60,
                               ),
@@ -857,7 +974,7 @@ class _State extends State<assurance> {
                             ],
                           ),
                           Row(
-                            children: [
+                            children: const [
                               SizedBox(
                                 width: 60,
                               ),
@@ -896,7 +1013,7 @@ class _State extends State<assurance> {
                   // conjoints
 
                   Row(
-                    children: [
+                    children: const [
                       SizedBox(
                         width: 450,
                         height: 80,
@@ -915,22 +1032,23 @@ class _State extends State<assurance> {
                     height: 30,
                   ),
                   Row(children: [
-                    SizedBox(
+                    const SizedBox(
                       width: 270,
                     ),
                     Container(
                         decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(30),
                             border: Border.all(
-                                color: Color.fromARGB(255, 185, 185, 185))),
+                                color:
+                                    const Color.fromARGB(255, 185, 185, 185))),
                         width: 800,
                         height: 250,
                         child: Column(children: [
-                          SizedBox(
+                          const SizedBox(
                             height: 15,
                           ),
                           Row(
-                            children: [
+                            children: const [
                               SizedBox(
                                 width: 60,
                               ),
@@ -964,7 +1082,7 @@ class _State extends State<assurance> {
                             ],
                           ),
                           Row(
-                            children: [
+                            children: const [
                               SizedBox(
                                 width: 60,
                               ),
@@ -998,7 +1116,7 @@ class _State extends State<assurance> {
                             ],
                           ),
                           Row(
-                            children: [
+                            children: const [
                               SizedBox(
                                 width: 60,
                               ),
@@ -1032,7 +1150,7 @@ class _State extends State<assurance> {
                             ],
                           ),
                           Row(
-                            children: [
+                            children: const [
                               SizedBox(
                                 width: 60,
                               ),
@@ -1074,37 +1192,37 @@ class _State extends State<assurance> {
                     height: 30,
                   ),
                   Row(children: [
-                    SizedBox(
+                    const SizedBox(
                       width: 270,
                     ),
                     Container(
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(30),
-                          color: Color.fromARGB(255, 207, 207, 207),
+                          color: const Color.fromARGB(255, 207, 207, 207),
                         ),
                         width: 800,
                         height: 360,
                         child: Column(children: [
-                          SizedBox(
+                          const SizedBox(
                             height: 30,
                           ),
-                          Text('Déclaration de l assuré',
+                          const Text('Déclaration de l assuré',
                               style: TextStyle(
                                   color: Color(0xFF4695CD),
                                   fontSize: 18,
                                   fontWeight: FontWeight.w700)),
-                          SizedBox(
+                          const SizedBox(
                             height: 30,
                           ),
                           Column(
                             children: [
-                              SizedBox(
+                              const SizedBox(
                                 width: 50,
                               ),
                               SizedBox(
                                 width: 700,
                                 child: Column(
-                                  children: [
+                                  children: const [
                                     Text(
                                         'L’assuré soussigné (Nom et Prénom de l’assuré).',
                                         textAlign: TextAlign.left),
@@ -1123,13 +1241,13 @@ class _State extends State<assurance> {
                                   ],
                                 ),
                               ),
-                              SizedBox(
+                              const SizedBox(
                                 height: 15,
                               ),
                             ],
                           ),
                           Row(
-                            children: [
+                            children: const [
                               SizedBox(
                                 width: 200,
                               ),
@@ -1148,22 +1266,22 @@ class _State extends State<assurance> {
                               ),
                             ],
                           ),
-                          SizedBox(
+                          const SizedBox(
                             height: 50,
                             width: 250,
                           ),
                           ElevatedButton(
                             onPressed: null,
-                            child: Text(
+                            style: ButtonStyle(
+                              backgroundColor: MaterialStateProperty.all(
+                                  const Color(0xFF4695CD)),
+                            ),
+                            child: const Text(
                               'Charger la signature',
                               style: TextStyle(
                                   color: Colors.white,
                                   fontWeight: FontWeight.w500,
                                   fontSize: 15),
-                            ),
-                            style: ButtonStyle(
-                              backgroundColor:
-                                  MaterialStateProperty.all(Color(0xFF4695CD)),
                             ),
                           ),
                         ]))
@@ -1180,12 +1298,24 @@ class _State extends State<assurance> {
                         width: 900,
                       ),
                       ElevatedButton(
-                        onPressed: _enregistrer,
-                        child: Text('Enregistrer',
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w500,
-                                fontSize: 15)),
+                        onPressed: () async {
+                          setState(() {
+                            loading = true;
+                          });
+
+                          assureModel.date_naissance = dateNaissance.toString();
+
+                          ApiService apiService = ApiService();
+                          final url =
+                              await apiService.inscrireAssure(assureModel);
+
+                          /*  var data = await apiService
+                          .getAllOperateurs();
+                      print(data);*/
+                          setState(() {
+                            loading = false;
+                          });
+                        },
                         style: ElevatedButton.styleFrom(
                           primary: Colors.orange,
                           padding: const EdgeInsets.symmetric(
@@ -1195,6 +1325,13 @@ class _State extends State<assurance> {
                                 BorderRadius.circular(20), // <-- Radius
                           ),
                         ),
+                        child: loading
+                            ? const CircularProgressIndicator()
+                            : const Text('Enregistrer',
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 15)),
                       ),
                     ],
                   ),

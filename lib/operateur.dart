@@ -23,8 +23,8 @@ class Operateur extends StatefulWidget {
 class _State extends State<Operateur> {
   XFile? signature;
   bool loading = false;
-  DateTime dateCreation = DateTime.now();
   DateTime dateNaissance = DateTime.now();
+  DateTime dateCreation = DateTime.now();
   DateTime dateDeclaration = DateTime.now();
 
   Future<void> _selectDateCreation(BuildContext context) async {

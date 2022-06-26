@@ -164,7 +164,7 @@ class _State extends State<inscription> {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (context) => assurance()),
+                                      builder: (context) => Assurance()),
                                 );
                               },
                               style: ElevatedButton.styleFrom(

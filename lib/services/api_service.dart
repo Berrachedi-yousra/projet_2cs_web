@@ -2,12 +2,14 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http_parser/http_parser.dart';
+import 'package:techme/models/assure.dart';
+import 'package:techme/models/facture.dart';
 import 'package:techme/models/operaeur.dart';
 
 import '../config/api.dart';
 import 'package:http/http.dart' as http;
 
-class ApiService  {
+class ApiService {
   Future inscrireOperateur(OperateurModel operateurModel) async {
     final url = apiUrl + "admin/newOperateur";
 
@@ -36,7 +38,6 @@ class ApiService  {
 
     print(operateurModel.toString());
 
-
     request.fields.addAll({
       "raison_social": operateurModel.raison_social ?? "d",
       "siege_social": operateurModel.siege_social ?? "d",
@@ -45,26 +46,29 @@ class ApiService  {
       "nombre_employes": operateurModel.nombre_employes ?? "0",
       "nombre_transportateur": operateurModel.nombre_transportateur ?? "0",
       "nombre_vehicule_type_a": operateurModel.nombre_vehicule_type_a ?? "0",
-      "nombre_vehicule_type_b": operateurModel.nombre_vehicule_type_b ?? "0" ,
+      "nombre_vehicule_type_b": operateurModel.nombre_vehicule_type_b ?? "0",
       "adresse_depart_vehicule_b":
           operateurModel.adresse_depart_vehicule_b ?? "x",
       "adresse_depart_vehicule_a":
           operateurModel.adresse_depart_vehicule_a ?? "6",
-      "nombre_vehicule_type_c":operateurModel.nombre_vehicule_type_c ?? "0",
+      "nombre_vehicule_type_c": operateurModel.nombre_vehicule_type_c ?? "0",
       "adresse_depart_vehicule_c":
-         operateurModel.adresse_depart_vehicule_c ?? "s",
+          operateurModel.adresse_depart_vehicule_c ?? "s",
       "disponibilite_materiel": operateurModel.disponibilite_materiel ?? "s",
       "declaration_adresse": operateurModel.declaration_adresse ?? "s",
       "declaration_date": operateurModel.declaration_date ?? '2000-11-17',
-      "nom_utilisateur":   "s",
-      "mot_de_pass":  "s",
+      "nom_utilisateur": "s",
+      "mot_de_pass": "s",
       "nom_dirigeant": operateurModel.nom_dirigeant ?? "s",
       "prenom_dirigeant": operateurModel.prenom_dirigeant ?? "s",
-      "date_naissance_dirigeant": operateurModel.date_naissance_dirigeant ?? "2000-11-17",
-      "lieu_naissance_dirigeant": operateurModel.lieu_naissance_dirigeant ?? "s",
+      "date_naissance_dirigeant":
+          operateurModel.date_naissance_dirigeant ?? "2000-11-17",
+      "lieu_naissance_dirigeant":
+          operateurModel.lieu_naissance_dirigeant ?? "s",
       "adresse_dirigeant": operateurModel.adresse_dirigeant ?? "s",
-      "sexe_dirigeant":operateurModel.sexe_dirigeant ?? "s",
-      "situation_familiale_dirigeant": operateurModel.situation_familiale_dirigeant ?? "s",
+      "sexe_dirigeant": operateurModel.sexe_dirigeant ?? "s",
+      "situation_familiale_dirigeant":
+          operateurModel.situation_familiale_dirigeant ?? "s",
     });
 
     try {
@@ -88,18 +92,155 @@ class ApiService  {
     }
   }
 
-  Future<List<dynamic>> getAllOperateurs() async {
+  Future inscrireAssure(AssureModel assureModel) async {
+    final url = apiUrl + "newAssure";
 
 
-    String url =
-        apiUrl + "operateurs";
-    print(url);
+
+    final headers = {
+      "Content-Type": "application/json",
+      "Access-Control-Allow-Origin": "*"
+    };
+
+
+
+   final body = {
+      "nss": assureModel.nss ?? "",
+      "nom": assureModel.nom ?? "",
+      "date_naissance": assureModel.date_naissance ?? '2000-11-17',
+      "sexe": assureModel.sexe ?? "",
+      "prenom": assureModel.prenom ?? "",
+      "lieu_naissance": assureModel.lieu_naissance ?? "",
+      "commune_naissance": assureModel.commune_naissance ?? "",
+      "wilaya_naissance": assureModel.wilaya_naissance ?? "",
+      "nationalite": assureModel.nationalite ?? "",
+      "code_postal": assureModel.code_postal ?? '',
+      "adresse_complete": assureModel.adresse_complete ?? "",
+      "situation_familliale": assureModel.situation_familliale ?? "",
+      "prenom_pere": assureModel.prenom_pere ?? "",
+      "prenom_mere": assureModel.prenom_mere ?? "",
+      "nom_mere": assureModel.nom_mere ?? "",
+      "nom_epoux": assureModel.nom_epoux ?? "",
+    };
+
+
+
 
     try {
 
+      final response = await http.post(Uri.parse(url),
+          headers: headers, body: jsonEncode(body));
+
+
+      print(response.statusCode);
+      if (response.statusCode == 200) {
+        print('assuré inscrit');
+
+        //notifyListeners();
+      } else {
+        print('error');
+
+        throw Error();
+      }
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  Future inscrireFacture(FactureModel factureModel) async {
+    final url = apiUrl + "admin/newFacture";
+
+    var request = http.MultipartRequest(
+      'POST',
+      Uri.parse(url),
+    );
+
+    request.files.add(
+      http.MultipartFile(
+        'fichier',
+        factureModel.capture_ecran!.readAsBytes().asStream(),
+        await factureModel.capture_ecran!.length(),
+        filename: factureModel.capture_ecran!.name,
+        contentType:
+        MediaType('image', factureModel.capture_ecran!.name.split(".")[1]),
+      ),
+    );
+    request.files.add(
+      http.MultipartFile(
+        'fichier',
+        factureModel.attestation_medical!.readAsBytes().asStream(),
+        await factureModel.attestation_medical!.length(),
+        filename: factureModel.attestation_medical!.name,
+        contentType:
+        MediaType('image', factureModel.attestation_medical!.name.split(".")[1]),
+      ),
+    );
+    request.files.add(
+      http.MultipartFile(
+        'fichier',
+        factureModel.certificat_soin!.readAsBytes().asStream(),
+        await factureModel.certificat_soin!.length(),
+        filename: factureModel.certificat_soin!.name,
+        contentType:
+        MediaType('image', factureModel.certificat_soin!.name.split(".")[1]),
+      ),
+    );
+
+    final headers = {
+      "Content-Type": "multipart/form-data",
+      "Access-Control-Allow-Origin": "*"
+    };
+
+    request.headers.addAll(headers);
+
+    print(factureModel.toString());
+
+    request.fields.addAll({
+     // "num": factureModel.num ?? "d",
+      "date_mission": factureModel.date_mission ?? "d",
+      "heure_depart": factureModel.heure_depart ?? "d",
+      "heure_arrive": factureModel.heure_arrive ?? "d",
+      "nom_malade": factureModel.nom_malade ?? "d",
+      "prenom_malade": factureModel.prenom_malade ?? "d",
+      "adresse_depart": factureModel.adresse_depart ?? "d",
+      "adresse_arrive": factureModel.adresse_arrive ?? "d",
+      "nombre_patient": factureModel.nombre_patient ?? "d",
+      "attente": factureModel.attente ?? "d",
+      "distance_retour": factureModel.distance_retour ?? "d",
+      "distance_siege": factureModel.distance_siege ?? "d",
+      "montant_total": factureModel.montant_total ?? "d",
+      "operateur": factureModel.operateur ?? "d",
+    });
+
+    try {
+      print(request.fields);
+      var response = await request.send();
+      var data = await response.stream.bytesToString();
+
+      print(response.statusCode);
+      if (response.statusCode == 200) {
+        print(data);
+        print('facture enregistrée');
+
+        //notifyListeners();
+      } else {
+        print('error');
+
+        throw Error();
+      }
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  Future<List<dynamic>> getAllOperateurs() async {
+    String url = apiUrl + "operateurs";
+    print(url);
+
+    try {
       final response = await http.get(
         Uri.parse(url),
-       /* headers: {
+        /* headers: {
           //"Content-Type": "application/json",
         },*/
       );
@@ -108,7 +249,6 @@ class ApiService  {
         List<dynamic> userData = json.decode(response.body);
 
         return userData;
-
       } else {
         final userData = json.decode(response.body);
         print(userData);

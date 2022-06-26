@@ -1,27 +1,49 @@
-import 'dart:html';
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:techme/transporteurs.dart';
 import 'package:techme/missions.dart';
 import 'package:techme/rembourssement.dart';
 import 'package:techme/acceuil_op.dart';
+import 'package:techme/services/api_service.dart';
+import 'package:techme/models/facture.dart';
 
 //import 'dart:async';
 
 void main() {
-  runApp(MaterialApp(debugShowCheckedModeBanner: false, home: facture()));
+  runApp(const MaterialApp(debugShowCheckedModeBanner: false, home: Facture()));
 }
 
-class facture extends StatefulWidget {
+class Facture extends StatefulWidget {
+  const Facture({Key? key}) : super(key: key);
+
   @override
   _State createState() => _State();
 }
 
-class _State extends State<facture> {
-  void _distance() {}
-  void _attestation() {}
-  void _certificat() {}
-  void _envoyer() {}
+class _State extends State<Facture> {
+  bool loading = false;
+  XFile? capture_ecran;
+  XFile? attestation_medical;
+  XFile? certificat_soin;
+  bool attente  = false;
+
+  FactureModel factureModel = FactureModel();
+
+  DateTime dateMission = DateTime.now();
+
+  Future<void> _selectDateCreation(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+        context: context,
+        initialDate: dateMission,
+        firstDate: DateTime(1970, 8),
+        lastDate: DateTime(2050));
+    if (picked != null && picked != dateMission) {
+      setState(() {
+        dateMission = picked;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,13 +56,13 @@ class _State extends State<facture> {
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => AcceuilOp()),
+                    MaterialPageRoute(builder: (context) => const AcceuilOp()),
                   );
                 },
-                child: Text('Acceuil',
+                child: const Text('Acceuil',
                     style: TextStyle(color: Colors.white, fontSize: 17)),
               ),
-              SizedBox(
+              const SizedBox(
                 width: 15,
                 height: 10,
               ),
@@ -51,10 +73,10 @@ class _State extends State<facture> {
                     MaterialPageRoute(builder: (context) => missions()),
                   );
                 },
-                child: Text('Missions',
+                child: const Text('Missions',
                     style: TextStyle(color: Colors.white, fontSize: 17)),
               ),
-              SizedBox(
+              const SizedBox(
                 width: 15,
               ),
               OutlinedButton(
@@ -64,23 +86,23 @@ class _State extends State<facture> {
                     MaterialPageRoute(builder: (context) => transporteurs()),
                   );
                 },
-                child: Text('Transporteurs',
+                child: const Text('Transporteurs',
                     style: TextStyle(color: Colors.white, fontSize: 17)),
               ),
-              SizedBox(
+              const SizedBox(
                 width: 15,
               ),
               OutlinedButton(
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => facture()),
+                    MaterialPageRoute(builder: (context) => const Facture()),
                   );
                 },
-                child: Text('Facture',
+                child: const Text('Facture',
                     style: TextStyle(color: Colors.white, fontSize: 17)),
               ),
-              SizedBox(
+              const SizedBox(
                 width: 15,
               ),
               OutlinedButton(
@@ -90,20 +112,19 @@ class _State extends State<facture> {
                     MaterialPageRoute(builder: (context) => rembourssement()),
                   );
                 },
-                child: Text('Rembourssement',
+                child: const Text('Rembourssement',
                     style: TextStyle(color: Colors.white, fontSize: 17)),
               ),
-              SizedBox(
+              const SizedBox(
                 width: 30,
               ),
             ],
           )
         ],
-        backgroundColor: Color(0xFF4695CD),
+        backgroundColor: const Color(0xFF4695CD),
         shadowColor: Colors.transparent,
       ),
-      body: Container(
-          child: Stack(
+      body: Stack(
         children: [
           Expanded(
               flex: 1,
@@ -154,10 +175,10 @@ class _State extends State<facture> {
                                 decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(30),
                                     border: Border.all(
-                                        color: Color.fromARGB(
+                                        color: const Color.fromARGB(
                                             255, 185, 185, 185))),
                                 width: 800,
-                                height: 800,
+                              //  height: 800,
                                 child: Column(children: [
                                   const SizedBox(
                                     height: 30,
@@ -179,18 +200,24 @@ class _State extends State<facture> {
                                       ),
                                       SizedBox(
                                         width: 500,
-                                        child: TextField(
+                                        child: TextFormField(
                                           textAlign: TextAlign.center,
+                                          onChanged: (val) {
+                                            setState(() {
+                                             // factureModel.num = val;
+                                            });
+                                          },
                                         ),
                                       ),
                                     ],
                                   ),
+                                  const SizedBox(height: 10,),
                                   Row(
                                     children: [
-                                      SizedBox(
+                                      const SizedBox(
                                         width: 60,
                                       ),
-                                      SizedBox(
+                                      const SizedBox(
                                         width: 180,
                                         child: Text(
                                           'Date de mission',
@@ -202,18 +229,37 @@ class _State extends State<facture> {
                                       ),
                                       SizedBox(
                                         width: 150,
-                                        child: TextField(
-                                          textAlign: TextAlign.center,
+                                        child: ElevatedButton(
+                                          onPressed: ()async{
+                                            await _selectDateCreation(context);
+                                          },
+                                          style: ElevatedButton.styleFrom(
+                                            primary: Colors.orange,
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 40, vertical: 10),
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                              BorderRadius.circular(20), // <-- Radius
+                                            ),
+                                          ),
+                                          child: Text(
+                                            "${dateMission.toLocal()}".split(' ')[0],
+                                            style: const TextStyle(
+                                                color: Colors.white,
+                                                fontWeight: FontWeight.w500,
+                                                fontSize: 13),
+                                          ),
+
                                         ),
                                       ),
                                     ],
                                   ),
                                   Row(
                                     children: [
-                                      SizedBox(
+                                      const SizedBox(
                                         width: 60,
                                       ),
-                                      SizedBox(
+                                      const SizedBox(
                                         width: 180,
                                         child: Text(
                                           'Heure de départ',
@@ -225,18 +271,23 @@ class _State extends State<facture> {
                                       ),
                                       SizedBox(
                                         width: 150,
-                                        child: TextField(
+                                        child: TextFormField(
                                           textAlign: TextAlign.center,
+                                          onChanged: (val) {
+                                            setState(() {
+                                              factureModel.heure_depart = val;
+                                            });
+                                          },
                                         ),
                                       ),
                                     ],
                                   ),
                                   Row(
                                     children: [
-                                      SizedBox(
+                                      const SizedBox(
                                         width: 60,
                                       ),
-                                      SizedBox(
+                                      const SizedBox(
                                         width: 180,
                                         child: Text(
                                           'Heure d"arrivé',
@@ -248,21 +299,26 @@ class _State extends State<facture> {
                                       ),
                                       SizedBox(
                                         width: 150,
-                                        child: TextField(
+                                        child: TextFormField(
                                           textAlign: TextAlign.center,
+                                          onChanged: (val) {
+                                            setState(() {
+                                              factureModel.heure_arrive = val;
+                                            });
+                                          },
                                         ),
                                       ),
                                     ],
                                   ),
                                   Row(
                                     children: [
-                                      SizedBox(
+                                      const SizedBox(
                                         width: 60,
                                       ),
-                                      SizedBox(
+                                      const SizedBox(
                                         width: 180,
                                         child: Text(
-                                          'Nom et prénom du malade',
+                                          'Nom du malade',
                                           style: TextStyle(
                                               color: Color.fromARGB(
                                                   255, 120, 120, 120),
@@ -271,18 +327,79 @@ class _State extends State<facture> {
                                       ),
                                       SizedBox(
                                         width: 500,
-                                        child: TextField(
+                                        child: TextFormField(
                                           textAlign: TextAlign.center,
+                                          onChanged: (val) {
+                                            setState(() {
+                                              factureModel.nom_malade = val;
+                                            });
+                                          },
                                         ),
                                       ),
                                     ],
                                   ),
                                   Row(
                                     children: [
-                                      SizedBox(
+                                      const SizedBox(
                                         width: 60,
                                       ),
+                                      const SizedBox(
+                                        width: 180,
+                                        child: Text(
+                                          'Prénom du malade',
+                                          style: TextStyle(
+                                              color: Color.fromARGB(
+                                                  255, 120, 120, 120),
+                                              fontWeight: FontWeight.w300),
+                                        ),
+                                      ),
                                       SizedBox(
+                                        width: 500,
+                                        child: TextFormField(
+                                          textAlign: TextAlign.center,
+                                          onChanged: (val) {
+                                            setState(() {
+                                              factureModel.prenom_malade = val;
+                                            });
+                                          },
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  Row(
+                                    children: [
+                                      const SizedBox(
+                                        width: 60,
+                                      ),
+                                      const SizedBox(
+                                        width: 180,
+                                        child: Text(
+                                          'Opérateuré',
+                                          style: TextStyle(
+                                              color: Color.fromARGB(
+                                                  255, 120, 120, 120),
+                                              fontWeight: FontWeight.w300),
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        width: 500,
+                                        child: TextFormField(
+                                          textAlign: TextAlign.center,
+                                          onChanged: (val) {
+                                            setState(() {
+                                              factureModel.operateur = val;
+                                            });
+                                          },
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  Row(
+                                    children: [
+                                      const SizedBox(
+                                        width: 60,
+                                      ),
+                                      const SizedBox(
                                         width: 180,
                                         child: Text(
                                           'Adresse de départ',
@@ -294,18 +411,23 @@ class _State extends State<facture> {
                                       ),
                                       SizedBox(
                                         width: 500,
-                                        child: TextField(
+                                        child: TextFormField(
                                           textAlign: TextAlign.center,
+                                          onChanged: (val) {
+                                            setState(() {
+                                              factureModel.adresse_depart = val;
+                                            });
+                                          },
                                         ),
                                       ),
                                     ],
                                   ),
                                   Row(
                                     children: [
-                                      SizedBox(
+                                      const SizedBox(
                                         width: 60,
                                       ),
-                                      SizedBox(
+                                      const SizedBox(
                                         width: 180,
                                         child: Text(
                                           'Adresse d"arrivé',
@@ -317,18 +439,23 @@ class _State extends State<facture> {
                                       ),
                                       SizedBox(
                                         width: 500,
-                                        child: TextField(
+                                        child: TextFormField(
                                           textAlign: TextAlign.center,
+                                          onChanged: (val) {
+                                            setState(() {
+                                              factureModel.adresse_arrive = val;
+                                            });
+                                          },
                                         ),
                                       ),
                                     ],
                                   ),
                                   Row(
                                     children: [
-                                      SizedBox(
+                                      const SizedBox(
                                         width: 60,
                                       ),
-                                      SizedBox(
+                                      const SizedBox(
                                         width: 180,
                                         child: Text(
                                           'Nombre de patients',
@@ -340,18 +467,23 @@ class _State extends State<facture> {
                                       ),
                                       SizedBox(
                                         width: 150,
-                                        child: TextField(
+                                        child: TextFormField(
                                           textAlign: TextAlign.center,
+                                          onChanged: (val) {
+                                            setState(() {
+                                              factureModel.nombre_patient = val;
+                                            });
+                                          },
                                         ),
                                       ),
                                     ],
                                   ),
                                   Row(
                                     children: [
-                                      SizedBox(
+                                      const SizedBox(
                                         width: 60,
                                       ),
-                                      SizedBox(
+                                      const SizedBox(
                                         width: 180,
                                         child: Text(
                                           'Attente',
@@ -363,18 +495,26 @@ class _State extends State<facture> {
                                       ),
                                       SizedBox(
                                         width: 150,
-                                        child: TextField(
-                                          textAlign: TextAlign.center,
+                                        child:  Checkbox(
+                                          checkColor: Colors.white,
+                                          activeColor: Colors.orange,
+                                          value: attente,
+                                          onChanged: (value) {
+                                            setState(() {
+                                              attente = value!;
+                                              factureModel.attente = attente.toString();
+                                            });
+                                          },
                                         ),
                                       ),
                                     ],
                                   ),
                                   Row(
                                     children: [
-                                      SizedBox(
+                                      const SizedBox(
                                         width: 60,
                                       ),
-                                      SizedBox(
+                                      const SizedBox(
                                         width: 180,
                                         child: Text(
                                           'Distance retour',
@@ -386,18 +526,24 @@ class _State extends State<facture> {
                                       ),
                                       SizedBox(
                                         width: 150,
-                                        child: TextField(
+                                        child: TextFormField(
                                           textAlign: TextAlign.center,
+                                          onChanged: (val) {
+                                            setState(() {
+                                              factureModel.distance_retour =
+                                                  val;
+                                            });
+                                          },
                                         ),
                                       ),
                                     ],
                                   ),
                                   Row(
                                     children: [
-                                      SizedBox(
+                                      const SizedBox(
                                         width: 60,
                                       ),
-                                      SizedBox(
+                                      const SizedBox(
                                         width: 180,
                                         child: Text(
                                           'Distance du siège',
@@ -409,8 +555,13 @@ class _State extends State<facture> {
                                       ),
                                       SizedBox(
                                         width: 500,
-                                        child: TextField(
+                                        child: TextFormField(
                                           textAlign: TextAlign.center,
+                                          onChanged: (val) {
+                                            setState(() {
+                                              factureModel.distance_siege = val;
+                                            });
+                                          },
                                         ),
                                       ),
                                     ],
@@ -434,7 +585,21 @@ class _State extends State<facture> {
                                         width: 50,
                                       ),
                                       IconButton(
-                                        onPressed: _distance,
+                                        onPressed: () async {
+                                          final ImagePicker _picker =
+                                              ImagePicker();
+                                          try {
+                                            var file = await _picker.pickImage(
+                                                source: ImageSource.gallery,
+                                                imageQuality: 50);
+
+                                            if (file != null) {
+                                              setState(() {
+                                                factureModel.capture_ecran = file;
+                                              });
+                                            }
+                                          } catch (e) {}
+                                        },
                                         icon: Image.asset('images/camera.png'),
                                         iconSize: 30,
                                       ),
@@ -459,14 +624,20 @@ class _State extends State<facture> {
                                         ),
                                       ),
                                       ElevatedButton(
-                                        onPressed: _attestation,
-                                        child: Text(
-                                          'Charger le document',
-                                          style: TextStyle(
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.w500,
-                                              fontSize: 13),
-                                        ),
+                                        onPressed: ()async {
+                                          final ImagePicker _picker = ImagePicker();
+                                          try {
+                                            var file = await _picker.pickImage(
+                                                source: ImageSource.gallery,
+                                                imageQuality: 50);
+
+                                            if (file != null) {
+                                              setState(() {
+                                                factureModel.attestation_medical = file;
+                                              });
+                                            }
+                                          } catch (e) {}
+                                        },
                                         style: ElevatedButton.styleFrom(
                                           primary: Colors.orange,
                                           padding: const EdgeInsets.symmetric(
@@ -475,6 +646,13 @@ class _State extends State<facture> {
                                             borderRadius: BorderRadius.circular(
                                                 20), // <-- Radius
                                           ),
+                                        ),
+                                        child: const Text(
+                                          'Charger le document',
+                                          style: TextStyle(
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.w500,
+                                              fontSize: 13),
                                         ),
                                       ),
                                     ],
@@ -498,14 +676,20 @@ class _State extends State<facture> {
                                         ),
                                       ),
                                       ElevatedButton(
-                                        onPressed: _attestation,
-                                        child: Text(
-                                          'Charger le document',
-                                          style: TextStyle(
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.w500,
-                                              fontSize: 13),
-                                        ),
+                                        onPressed: ()async {
+                                          final ImagePicker _picker = ImagePicker();
+                                          try {
+                                            var file = await _picker.pickImage(
+                                                source: ImageSource.gallery,
+                                                imageQuality: 50);
+
+                                            if (file != null) {
+                                              setState(() {
+                                                factureModel.certificat_soin = file;
+                                              });
+                                            }
+                                          } catch (e) {}
+                                        },
                                         style: ElevatedButton.styleFrom(
                                           primary: Colors.orange,
                                           padding: const EdgeInsets.symmetric(
@@ -514,6 +698,13 @@ class _State extends State<facture> {
                                             borderRadius: BorderRadius.circular(
                                                 20), // <-- Radius
                                           ),
+                                        ),
+                                        child: const Text(
+                                          'Charger le document',
+                                          style: TextStyle(
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.w500,
+                                              fontSize: 13),
                                         ),
                                       ),
                                     ],
@@ -533,33 +724,55 @@ class _State extends State<facture> {
                                               fontWeight: FontWeight.w300),
                                         ),
                                       ),
-                                      const SizedBox(
+                                      SizedBox(
                                         width: 150,
-                                        child: TextField(
+                                        child: TextFormField(
                                           textAlign: TextAlign.center,
+                                          onChanged: (val) {
+                                            setState(() {
+                                              factureModel.montant_total = val;
+                                            });
+                                          },
                                         ),
                                       ),
                                       const SizedBox(
                                         width: 225,
                                       ),
                                       ElevatedButton(
-                                        onPressed: _envoyer,
-                                        child: Text(
-                                          'Envoyer',
-                                          style: TextStyle(
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.w500,
-                                              fontSize: 15),
-                                        ),
+                                        onPressed: () async {
+                                          setState(() {
+                                            loading = true;
+                                          });
+
+                                          factureModel.date_mission =  dateMission.toString();
+
+                                          ApiService apiService = ApiService();
+                                          final url = await apiService
+                                              .inscrireFacture(factureModel);
+
+                                          /*  var data = await apiService
+                      .getAllOperateurs();
+                  print(data);*/
+                                          setState(() {
+                                            loading = false;
+                                          });
+                                        },
                                         style: ElevatedButton.styleFrom(
-                                          primary: Color(0xFF4695CD),
+                                          primary: const Color(0xFF4695CD),
                                           padding: const EdgeInsets.symmetric(
-                                              horizontal: 35, vertical: 17),
+                                              horizontal: 50, vertical: 20),
                                           shape: RoundedRectangleBorder(
                                             borderRadius: BorderRadius.circular(
                                                 20), // <-- Radius
                                           ),
                                         ),
+                                        child: loading
+                                            ? const CircularProgressIndicator()
+                                            : const Text('Envoyer',
+                                                style: TextStyle(
+                                                    color: Colors.white,
+                                                    fontWeight: FontWeight.w500,
+                                                    fontSize: 15)),
                                       ),
                                     ],
                                   ),
@@ -580,7 +793,7 @@ class _State extends State<facture> {
                 ],
               ))),
         ],
-      )),
+      ),
     );
   }
 }

@@ -72,7 +72,7 @@ class _State extends State<missions> {
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => facture()),
+                    MaterialPageRoute(builder: (context) => Facture()),
                   );
                 },
                 child: Text('Facture',
