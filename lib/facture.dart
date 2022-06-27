@@ -10,9 +10,7 @@ import 'package:techme/models/facture.dart';
 
 //import 'dart:async';
 
-void main() {
-  runApp(const MaterialApp(debugShowCheckedModeBanner: false, home: Facture()));
-}
+
 
 class Facture extends StatefulWidget {
   const Facture({Key? key}) : super(key: key);

@@ -3,15 +3,10 @@ import 'package:image_picker/image_picker.dart';
 import 'package:techme/connexion.dart';
 import 'package:techme/main.dart';
 import 'package:techme/models/operaeur.dart';
-import 'package:techme/reclamation.dart';
+import 'package:techme/screens/reclamation/reclamation.dart';
 import 'package:techme/inscription.dart';
 import 'package:techme/services/api_service.dart';
 
-//import 'dart:async';
-
-void main() {
-  runApp(const MaterialApp(home: Operateur()));
-}
 
 class Operateur extends StatefulWidget {
   const Operateur({Key? key}) : super(key: key);
@@ -21,17 +16,23 @@ class Operateur extends StatefulWidget {
 }
 
 class _State extends State<Operateur> {
+
+
   XFile? signature;
   bool loading = false;
   DateTime dateNaissance = DateTime.now();
   DateTime dateCreation = DateTime.now();
   DateTime dateDeclaration = DateTime.now();
 
+
+
+
+
   Future<void> _selectDateCreation(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
         context: context,
         initialDate: dateCreation,
-        firstDate: DateTime(1970, 8),
+        firstDate: DateTime(1920, 8),
         lastDate: DateTime(2050));
     if (picked != null && picked != dateCreation) {
       setState(() {
@@ -44,7 +45,7 @@ class _State extends State<Operateur> {
     final DateTime? picked = await showDatePicker(
         context: context,
         initialDate: dateNaissance,
-        firstDate: DateTime(1970, 8),
+        firstDate: DateTime(1920, 8),
         lastDate: DateTime(2050));
     if (picked != null && picked != dateNaissance) {
       setState(() {
@@ -57,8 +58,8 @@ class _State extends State<Operateur> {
     final DateTime? picked = await showDatePicker(
         context: context,
         initialDate: dateDeclaration,
-        firstDate: DateTime(2015, 8),
-        lastDate: DateTime(2101));
+        firstDate: DateTime(1920, 8),
+        lastDate: DateTime(2050));
     if (picked != null && picked != dateDeclaration) {
       setState(() {
         dateDeclaration = picked;
@@ -112,7 +113,7 @@ class _State extends State<Operateur> {
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => reclamation()),
+                    MaterialPageRoute(builder: (context) => Reclamation()),
                   );
                 },
                 child: const Text('Réclamaton',

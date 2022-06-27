@@ -2,22 +2,55 @@ import 'dart:html';
 import 'package:flutter/material.dart';
 import 'package:techme/connexion.dart';
 import 'package:techme/main.dart';
-import 'package:techme/reclamation.dart';
+import 'package:techme/models/reclamation.dart';
+import 'package:techme/screens/reclamation/reclamation.dart';
 import 'package:techme/inscription.dart';
+import 'package:techme/services/api_service.dart';
 
 //import 'dart:async';
 
-void main() {
-  runApp(MaterialApp(home: reclamsurop()));
-}
+class ReclamationCnas extends StatefulWidget {
+  const ReclamationCnas({Key? key}) : super(key: key);
 
-class reclamsurop extends StatefulWidget {
   @override
   _State createState() => _State();
 }
 
-class _State extends State<reclamsurop> {
-  void _enregistrer() {}
+class _State extends State<ReclamationCnas> {
+
+  ReclamationModel reclamationModel = ReclamationModel();
+
+  DateTime dateNaissance = DateTime.now();
+  DateTime dateAccident = DateTime.now();
+  DateTime dateReclamation = DateTime.now();
+  bool loading = false;
+
+  Future<void> _selectDatedateAccident(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+        context: context,
+        initialDate: dateAccident,
+        firstDate: DateTime(1920, 8),
+        lastDate: DateTime(2050));
+    if (picked != null && picked != dateAccident) {
+      setState(() {
+        dateAccident = picked;
+      });
+    }
+  }
+
+  Future<void> _selectDateNaissance(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+        context: context,
+        initialDate: dateNaissance,
+        firstDate: DateTime(1920, 8),
+        lastDate: DateTime(2050));
+    if (picked != null && picked != dateNaissance) {
+      setState(() {
+        dateNaissance = picked;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -32,10 +65,10 @@ class _State extends State<reclamsurop> {
                     MaterialPageRoute(builder: (context) => MyApp()),
                   );
                 },
-                child: Text('Acceuil',
+                child: const Text('Acceuil',
                     style: TextStyle(color: Colors.white, fontSize: 17)),
               ),
-              SizedBox(
+              const SizedBox(
                 width: 15,
                 height: 10,
               ),
@@ -46,31 +79,32 @@ class _State extends State<reclamsurop> {
                     MaterialPageRoute(builder: (context) => inscription()),
                   );
                 },
-                child: Text('Inscription',
+                child: const Text('Inscription',
                     style: TextStyle(color: Colors.white, fontSize: 17)),
               ),
-              SizedBox(
+              const SizedBox(
                 width: 15,
               ),
               OutlinedButton(
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => reclamation()),
+                    MaterialPageRoute(
+                        builder: (context) => const Reclamation()),
                   );
                 },
-                child: Text('Réclamaton',
+                child: const Text('Réclamaton',
                     style: TextStyle(color: Colors.white, fontSize: 17)),
               ),
-              SizedBox(
+              const SizedBox(
                 width: 15,
               ),
-              OutlinedButton(
+              const OutlinedButton(
                 onPressed: null,
                 child: Text('A propos',
                     style: TextStyle(color: Colors.white, fontSize: 17)),
               ),
-              SizedBox(
+              const SizedBox(
                 width: 15,
               ),
               OutlinedButton(
@@ -83,20 +117,19 @@ class _State extends State<reclamsurop> {
                 style: ButtonStyle(
                   backgroundColor: MaterialStateProperty.all(Colors.white),
                 ),
-                child: Text('Connexion',
+                child: const Text('Connexion',
                     style: TextStyle(color: Color(0xFF4695CD), fontSize: 17)),
               ),
-              SizedBox(
+              const SizedBox(
                 width: 30,
               ),
             ],
           )
         ],
-        backgroundColor: Color(0xFF4695CD),
+        backgroundColor: const Color(0xFF4695CD),
         shadowColor: Colors.transparent,
       ),
-      body: Container(
-          child: Stack(
+      body: Stack(
         children: [
           Expanded(
               flex: 1,
@@ -107,7 +140,7 @@ class _State extends State<reclamsurop> {
                   // Titre de page
 
                   Row(
-                    children: [
+                    children: const [
                       SizedBox(
                         height: 200,
                         width: 560,
@@ -115,7 +148,7 @@ class _State extends State<reclamsurop> {
                       SizedBox(
                         width: 230,
                         child: Text(
-                          'Réclamation sur un opérateur',
+                          'Réclamation en tant qu employé de la CNAS',
                           style: TextStyle(
                               color: Color(0xFF4695CD),
                               fontWeight: FontWeight.w700,
@@ -126,16 +159,16 @@ class _State extends State<reclamsurop> {
                     ],
                   ),
 
-                  // renseignement concernant l'opérateur
+                  // renseignement de l'opérateur
 
                   Row(
-                    children: [
+                    children: const [
                       SizedBox(
                         width: 525,
                         height: 10,
                       ),
                       Text(
-                        'Renseignement concernant l opérateur',
+                        'Renseignement concernant l employé',
                         style: TextStyle(
                             color: Colors.orange,
                             fontWeight: FontWeight.w700,
@@ -144,12 +177,12 @@ class _State extends State<reclamsurop> {
                     ],
                   ),
 
-                  SizedBox(
+                  const SizedBox(
                     height: 30,
                   ),
                   Row(
                     children: [
-                      SizedBox(
+                      const SizedBox(
                         width: 270,
                       ),
                       Container(
@@ -158,20 +191,20 @@ class _State extends State<reclamsurop> {
                             border: Border.all(
                                 color: Color.fromARGB(255, 185, 185, 185))),
                         width: 800,
-                        height: 250,
+                        height: 300,
                         child: Column(children: [
-                          SizedBox(
+                          const SizedBox(
                             height: 10,
                           ),
                           Row(
                             children: [
-                              SizedBox(
+                              const SizedBox(
                                 width: 60,
                               ),
-                              SizedBox(
+                              const SizedBox(
                                 width: 180,
                                 child: Text(
-                                  'Raison sociale',
+                                  'Matricule',
                                   style: TextStyle(
                                       color: Color.fromARGB(255, 120, 120, 120),
                                       fontWeight: FontWeight.w300),
@@ -179,21 +212,26 @@ class _State extends State<reclamsurop> {
                               ),
                               SizedBox(
                                 width: 500,
-                                child: TextField(
+                                child: TextFormField(
                                   textAlign: TextAlign.center,
+                                  onChanged: (val) {
+                                    setState(() {
+                                      reclamationModel.matricule = val;
+                                    });
+                                  },
                                 ),
                               ),
                             ],
                           ),
                           Row(
                             children: [
-                              SizedBox(
+                              const SizedBox(
                                 width: 60,
                               ),
-                              SizedBox(
+                              const SizedBox(
                                 width: 180,
                                 child: Text(
-                                  'Siège social',
+                                  'Nom',
                                   style: TextStyle(
                                       color: Color.fromARGB(255, 120, 120, 120),
                                       fontWeight: FontWeight.w300),
@@ -201,21 +239,56 @@ class _State extends State<reclamsurop> {
                               ),
                               SizedBox(
                                 width: 500,
-                                child: TextField(
+                                child: TextFormField(
                                   textAlign: TextAlign.center,
+                                  onChanged: (val) {
+                                    setState(() {
+                                      reclamationModel.nom = val;
+                                    });
+                                  },
                                 ),
                               ),
                             ],
                           ),
                           Row(
                             children: [
-                              SizedBox(
+                              const SizedBox(
                                 width: 60,
                               ),
-                              SizedBox(
+                              const SizedBox(
                                 width: 180,
                                 child: Text(
-                                  'Wilaya',
+                                  'Prénom',
+                                  style: TextStyle(
+                                      color: Color.fromARGB(255, 120, 120, 120),
+                                      fontWeight: FontWeight.w300),
+                                ),
+                              ),
+                              SizedBox(
+                                width: 500,
+                                child: TextFormField(
+                                  textAlign: TextAlign.center,
+                                  onChanged: (val) {
+                                    setState(() {
+                                      reclamationModel.prenom = val;
+                                    });
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          Row(
+                            children: [
+                              const SizedBox(
+                                width: 60,
+                              ),
+                              const SizedBox(
+                                width: 180,
+                                child: Text(
+                                  'Date de naissance',
                                   style: TextStyle(
                                       color: Color.fromARGB(255, 120, 120, 120),
                                       fontWeight: FontWeight.w300),
@@ -223,30 +296,53 @@ class _State extends State<reclamsurop> {
                               ),
                               SizedBox(
                                 width: 150,
-                                child: TextField(
-                                  textAlign: TextAlign.center,
+                                child: ElevatedButton(
+                                  onPressed: () async {
+                                    await _selectDateNaissance(context);
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    primary: Colors.orange,
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 40, vertical: 10),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(
+                                          20), // <-- Radius
+                                    ),
+                                  ),
+                                  child: Text(
+                                    "${dateNaissance.toLocal()}".split(' ')[0],
+                                    style: const TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: 13),
+                                  ),
                                 ),
                               ),
                             ],
                           ),
                           Row(
                             children: [
-                              SizedBox(
+                              const SizedBox(
                                 width: 60,
                               ),
-                              SizedBox(
+                              const SizedBox(
                                 width: 180,
                                 child: Text(
-                                  'Poste de l emetteur',
+                                  'Siège de travail',
                                   style: TextStyle(
                                       color: Color.fromARGB(255, 120, 120, 120),
                                       fontWeight: FontWeight.w300),
                                 ),
                               ),
                               SizedBox(
-                                width: 150,
-                                child: TextField(
+                                width: 500,
+                                child: TextFormField(
                                   textAlign: TextAlign.center,
+                                  onChanged: (val) {
+                                    setState(() {
+                                      reclamationModel.siege_social = val;
+                                    });
+                                  },
                                 ),
                               ),
                             ],
@@ -259,7 +355,7 @@ class _State extends State<reclamsurop> {
                   // Contenu de la réclamation
 
                   Row(
-                    children: [
+                    children: const [
                       SizedBox(
                         width: 575,
                         height: 80,
@@ -274,31 +370,31 @@ class _State extends State<reclamsurop> {
                     ],
                   ),
 
-                  SizedBox(
+                  const SizedBox(
                     height: 30,
                   ),
                   Row(
                     children: [
-                      SizedBox(
+                      const SizedBox(
                         width: 270,
                       ),
                       Container(
                         decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(30),
                             border: Border.all(
-                                color: Color.fromARGB(255, 185, 185, 185))),
+                                color:
+                                    const Color.fromARGB(255, 185, 185, 185))),
                         width: 800,
-                        height: 300,
                         child: Column(children: [
-                          SizedBox(
+                          const SizedBox(
                             height: 10,
                           ),
                           Row(
                             children: [
-                              SizedBox(
+                              const SizedBox(
                                 width: 60,
                               ),
-                              SizedBox(
+                              const SizedBox(
                                 width: 180,
                                 child: Text(
                                   'Réclamation sur',
@@ -309,40 +405,26 @@ class _State extends State<reclamsurop> {
                               ),
                               SizedBox(
                                 width: 150,
-                                child: TextField(
+                                child: TextFormField(
                                   textAlign: TextAlign.center,
+                                  onChanged: (val) {
+                                    setState(() {
+                                      reclamationModel.reclamation_sur = val;
+                                    });
+                                  },
                                 ),
                               ),
                             ],
                           ),
-                          Row(
-                            children: [
-                              SizedBox(
-                                width: 60,
-                              ),
-                              SizedBox(
-                                width: 180,
-                                child: Text(
-                                  'Nom',
-                                  style: TextStyle(
-                                      color: Color.fromARGB(255, 120, 120, 120),
-                                      fontWeight: FontWeight.w300),
-                                ),
-                              ),
-                              SizedBox(
-                                width: 150,
-                                child: TextField(
-                                  textAlign: TextAlign.center,
-                                ),
-                              ),
-                            ],
+                          const SizedBox(
+                            height: 10,
                           ),
                           Row(
                             children: [
-                              SizedBox(
+                              const SizedBox(
                                 width: 60,
                               ),
-                              SizedBox(
+                              const SizedBox(
                                 width: 180,
                                 child: Text(
                                   'Date de l accident',
@@ -353,40 +435,36 @@ class _State extends State<reclamsurop> {
                               ),
                               SizedBox(
                                 width: 150,
-                                child: TextField(
-                                  textAlign: TextAlign.center,
+                                child: ElevatedButton(
+                                  onPressed: () async {
+                                    await _selectDatedateAccident(context);
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    primary: Colors.orange,
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 40, vertical: 10),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(
+                                          20), // <-- Radius
+                                    ),
+                                  ),
+                                  child: Text(
+                                    "${dateAccident.toLocal()}".split(' ')[0],
+                                    style: const TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: 13),
+                                  ),
                                 ),
                               ),
                             ],
                           ),
                           Row(
                             children: [
-                              SizedBox(
+                              const SizedBox(
                                 width: 60,
                               ),
-                              SizedBox(
-                                width: 180,
-                                child: Text(
-                                  'Date de réclamation',
-                                  style: TextStyle(
-                                      color: Color.fromARGB(255, 120, 120, 120),
-                                      fontWeight: FontWeight.w300),
-                                ),
-                              ),
-                              SizedBox(
-                                width: 150,
-                                child: TextField(
-                                  textAlign: TextAlign.center,
-                                ),
-                              ),
-                            ],
-                          ),
-                          Row(
-                            children: [
-                              SizedBox(
-                                width: 60,
-                              ),
-                              SizedBox(
+                              const SizedBox(
                                 width: 180,
                                 child: Text(
                                   'De quoi s agit-il?',
@@ -397,8 +475,14 @@ class _State extends State<reclamsurop> {
                               ),
                               SizedBox(
                                 width: 500,
-                                child: TextField(
+                                child: TextFormField(
                                   textAlign: TextAlign.center,
+                                  onChanged: (val) {
+                                    setState(() {
+                                      reclamationModel.contenu_reclamation =
+                                          val;
+                                    });
+                                  },
                                 ),
                               ),
                             ],
@@ -412,17 +496,34 @@ class _State extends State<reclamsurop> {
 
                   Row(
                     children: [
-                      SizedBox(
+                      const SizedBox(
                         width: 900,
                         height: 150,
                       ),
                       ElevatedButton(
-                        onPressed: _enregistrer,
-                        child: Text('Enregistrer',
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w500,
-                                fontSize: 15)),
+                        onPressed: () async {
+                          setState(() {
+                            loading = true;
+                          });
+
+                          reclamationModel.date_accident =
+                              dateAccident.toString();
+                          reclamationModel.date_naissance =
+                              dateNaissance.toString();
+                          reclamationModel.date_reclamation =
+                              DateTime.now().toString();
+
+                          ApiService apiService = ApiService();
+                          final url = await apiService.inscrireReclamation(
+                              reclamationModel, "cnas");
+
+                          /*  var data = await apiService
+                      .getAllOperateurs();
+                  print(data);*/
+                          setState(() {
+                            loading = false;
+                          });
+                        },
                         style: ElevatedButton.styleFrom(
                           primary: Colors.orange,
                           padding: const EdgeInsets.symmetric(
@@ -432,13 +533,22 @@ class _State extends State<reclamsurop> {
                                 BorderRadius.circular(20), // <-- Radius
                           ),
                         ),
+                        child: loading
+                            ? const Center(
+                                child: CircularProgressIndicator(),
+                              )
+                            : const Text('Enregistrer',
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 15)),
                       ),
                     ],
                   ),
 
                   //color footer
 
-                  SizedBox(
+                  const SizedBox(
                     height: 20,
                   ),
                   Container(
@@ -448,7 +558,7 @@ class _State extends State<reclamsurop> {
                 ],
               ))),
         ],
-      )),
+      ),
     );
   }
 }

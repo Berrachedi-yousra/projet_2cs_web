@@ -1,17 +1,10 @@
-import 'dart:html';
 import 'package:flutter/material.dart';
-import 'package:techme/main.dart';
 import 'package:techme/acceuil_cnas.dart';
-import 'package:techme/reclamation_cnas.dart';
-import 'package:techme/op.dart';
+import 'package:techme/screens/operateur/operateurs_screen.dart';
 import 'package:techme/control.dart';
 
+import 'screens/reclamation/reclamations_cnas_screen.dart';
 
-//import 'dart:async';
-
-void main() {
-  runApp(MaterialApp(debugShowCheckedModeBanner: false, home: tb()));
-}
 
 class tb extends StatefulWidget {
   @override
@@ -59,7 +52,7 @@ class _State extends State<tb> {
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => op()),
+                    MaterialPageRoute(builder: (context) => OperateursScreen()),
                   );
                 },
                 child: Text('Opérateurs',
@@ -72,7 +65,7 @@ class _State extends State<tb> {
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => control()),
+                    MaterialPageRoute(builder: (context) => ControlScreen()),
                   );
                 },
                 child: Text('Control',
@@ -85,7 +78,7 @@ class _State extends State<tb> {
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => reclamation_cnas()),
+                    MaterialPageRoute(builder: (context) => ReclamationCnasScreen()),
                   );
                 },
                 child: Text('Réclamations',

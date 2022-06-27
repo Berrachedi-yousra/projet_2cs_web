@@ -1,7 +1,7 @@
 import 'dart:html';
 import 'package:flutter/material.dart';
 import 'package:techme/main.dart';
-import 'package:techme/reclamation.dart';
+import 'package:techme/screens/reclamation/reclamation.dart';
 import 'package:techme/inscription.dart';
 import 'package:techme/acceuil_op.dart';
 import 'package:techme/acceuil_cnas.dart';

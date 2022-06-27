@@ -3,22 +3,18 @@ import 'package:flutter/material.dart';
 import 'package:techme/main.dart';
 import 'package:techme/acceuil_cnas.dart';
 import 'package:techme/tb.dart';
-import 'package:techme/op.dart';
-import 'package:techme/reclamation_cnas.dart';
+import 'package:techme/screens/operateur/operateurs_screen.dart';
 import 'package:techme/liste_controles.dart';
 
-//import 'dart:async';
+import 'screens/reclamation/reclamations_cnas_screen.dart';
 
-void main() {
-  runApp(MaterialApp(debugShowCheckedModeBanner: false, home: control()));
-}
 
-class control extends StatefulWidget {
+class ControlScreen extends StatefulWidget {
   @override
   _State createState() => _State();
 }
 
-class _State extends State<control> {
+class _State extends State<ControlScreen> {
   void _enregistrer() {}
 
   @override
@@ -59,7 +55,7 @@ class _State extends State<control> {
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => op()),
+                    MaterialPageRoute(builder: (context) => OperateursScreen()),
                   );
                 },
                 child: Text('Opérateurs',
@@ -72,7 +68,7 @@ class _State extends State<control> {
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => control()),
+                    MaterialPageRoute(builder: (context) => ControlScreen()),
                   );
                 },
                 child: Text('Control',
@@ -85,7 +81,7 @@ class _State extends State<control> {
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => reclamation_cnas()),
+                    MaterialPageRoute(builder: (context) => ReclamationCnasScreen()),
                   );
                 },
                 child: Text('Réclamations',
@@ -181,7 +177,7 @@ class _State extends State<control> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => liste_controles()),
+                                builder: (context) => ListControlsScreen()),
                           );
                         },
                         style: ElevatedButton.styleFrom(

@@ -5,6 +5,9 @@ import 'package:http_parser/http_parser.dart';
 import 'package:techme/models/assure.dart';
 import 'package:techme/models/facture.dart';
 import 'package:techme/models/operaeur.dart';
+import 'package:techme/models/reclamation.dart';
+import 'package:techme/models/remboursement.dart';
+import 'package:techme/models/transportateur.dart';
 
 import '../config/api.dart';
 import 'package:http/http.dart' as http;
@@ -92,6 +95,64 @@ class ApiService {
     }
   }
 
+  Future inscrireRemboursement(RemboursementModel remboursementModel) async {
+    final url = apiUrl + "admin/newDemandeRemboursement";
+
+    var request = http.MultipartRequest(
+      'POST',
+      Uri.parse(url),
+    );
+
+    request.files.add(
+      http.MultipartFile(
+        'preuves',
+        remboursementModel.preuve!.readAsBytes().asStream(),
+        await remboursementModel.preuve!.length(),
+        filename: remboursementModel.preuve!.name,
+        contentType:
+        MediaType('image', remboursementModel.preuve!.name.split(".")[1]),
+      ),
+    );
+
+    final headers = {
+      "Content-Type": "multipart/form-data",
+      "Access-Control-Allow-Origin": "*"
+    };
+
+    request.headers.addAll(headers);
+
+    print(remboursementModel.toString());
+
+    request.fields.addAll({
+      "numero_facture": remboursementModel.numero_facture ?? "0",
+      "montant_rembourse": remboursementModel.montant_rembourse ?? "0",
+      "montant_attendu": remboursementModel.montant_attendu ?? '0',
+      "explication_preuve": remboursementModel.explication_preuve ?? "x",
+
+
+    });
+
+    try {
+      print(request.fields);
+      var response = await request.send();
+      var data = await response.stream.bytesToString();
+
+      print(response.statusCode);
+      if (response.statusCode == 200) {
+        print(data);
+        print('opérateur inscrit');
+
+        //notifyListeners();
+      } else {
+        print('error');
+
+        throw Error();
+      }
+    } catch (e) {
+      throw e;
+    }
+  }
+
   Future inscrireAssure(AssureModel assureModel) async {
     final url = apiUrl + "newAssure";
 
@@ -135,6 +196,61 @@ class ApiService {
       print(response.statusCode);
       if (response.statusCode == 200) {
         print('assuré inscrit');
+
+        //notifyListeners();
+      } else {
+        print('error');
+
+        throw Error();
+      }
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  Future inscrireReclamation(ReclamationModel reclamationModel,String type) async {
+    final url = apiUrl + "newReclamation";
+
+
+
+    final headers = {
+      "Content-Type": "application/json",
+      "Access-Control-Allow-Origin": "*"
+    };
+
+
+
+    final body = {
+
+      "type_reclammation": type,
+      "matricule": reclamationModel.matricule,
+      "nom": reclamationModel.nom,
+      "prenom": reclamationModel.prenom,
+      "date_naissance": reclamationModel.date_naissance,
+      "si_assure": reclamationModel.si_assure,
+      "adresse": reclamationModel.adresse,
+      "numero_telephone": reclamationModel.numero_telephone,
+      "raison_social": reclamationModel.raison_social,
+      "siege_social": reclamationModel.siege_social,
+      "post_emetteur": reclamationModel.post_emetteur,
+      "reclamation_sur": reclamationModel.reclamation_sur,
+      "date_accident": reclamationModel.date_accident,
+      "date_reclamation":reclamationModel.date_reclamation,
+      "contenu_reclamation": reclamationModel.contenu_reclamation,
+    };
+
+
+
+
+    try {
+
+      final response = await http.post(Uri.parse(url),
+          headers: headers, body: jsonEncode(body));
+
+
+      print(response.statusCode);
+      if (response.statusCode == 200) {
+        print('reclamation inscrit');
 
         //notifyListeners();
       } else {
@@ -233,7 +349,7 @@ class ApiService {
     }
   }
 
-  Future<List<dynamic>> getAllOperateurs() async {
+  Future<OperateursModel> getAllOperateurs() async {
     String url = apiUrl + "operateurs";
     print(url);
 
@@ -245,17 +361,78 @@ class ApiService {
         },*/
       );
       if (response.statusCode == 200) {
-        print("test");
         List<dynamic> userData = json.decode(response.body);
-
-        return userData;
+        OperateursModel operateursModel = OperateursModel.fromJson(userData);
+        return operateursModel;
       } else {
         final userData = json.decode(response.body);
+
         print(userData);
         print('xxx');
         throw Error();
       }
     } catch (e) {
+      throw e;
+    }
+  }
+
+  Future<TransportateursModel> getOperateursAllTransportateur(String idOperateur) async {
+    String url = apiUrl + "operateurs/${idOperateur}/transportateurs";
+    print(url);
+
+    try {
+      final response = await http.get(
+        Uri.parse(url),
+        /* headers: {
+          //"Content-Type": "application/json",
+        },*/
+      );
+      if (response.statusCode == 200) {
+        List<dynamic> userData = json.decode(response.body);
+        TransportateursModel transportateursModel = TransportateursModel.fromJson(userData);
+        return transportateursModel;
+      } else {
+        final userData = json.decode(response.body);
+
+        print(userData);
+        print('xxx');
+        throw Error();
+      }
+    } catch (e) {
+      throw e;
+    }
+  }
+
+
+
+  Future<ReclamationsModel> getAllReclamations() async {
+    String url = apiUrl + "admin/getAllReclamations";
+    print(url);
+
+    try {
+      final response = await http.get(
+        Uri.parse(url),
+        /* headers: {
+          //"Content-Type": "application/json",
+        },*/
+      );
+
+      if (response.statusCode == 200) {
+
+
+        List<dynamic> userData = json.decode(response.body);
+        print(userData.length);
+        ReclamationsModel reclamationsModel = ReclamationsModel.fromJson(userData);
+        return reclamationsModel;
+      } else {
+
+        final userData = json.decode(response.body);
+
+        print(userData);
+        throw Error();
+      }
+    } catch (e) {
+
       throw e;
     }
   }

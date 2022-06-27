@@ -6,7 +6,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/material.dart';
 import 'package:techme/connexion.dart';
 import 'package:techme/inscription.dart';
-import 'package:techme/reclamation.dart';
+import 'package:techme/screens/reclamation/reclamation.dart';
 //import 'dart:async';
 
 void main() {
@@ -69,7 +69,7 @@ class _State extends State<MyApp> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => reclamation()),
+                              builder: (context) => Reclamation()),
                         );
                       },
                       child: Text('Réclamaton',

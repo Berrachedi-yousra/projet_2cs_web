@@ -1,16 +1,15 @@
 import 'dart:html';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:techme/models/remboursement.dart';
 import 'package:techme/transporteurs.dart';
 import 'package:techme/facture.dart';
 import 'package:techme/missions.dart';
 import 'package:techme/acceuil_op.dart';
 
-//import 'dart:async';
+import 'services/api_service.dart';
 
-void main() {
-  runApp(
-      MaterialApp(debugShowCheckedModeBanner: false, home: rembourssement()));
-}
+
 
 class rembourssement extends StatefulWidget {
   @override
@@ -18,8 +17,10 @@ class rembourssement extends StatefulWidget {
 }
 
 class _State extends State<rembourssement> {
-  void _envoyer() {}
-  void _joindre() {}
+
+  RemboursementModel remboursementModel = RemboursementModel();
+
+  bool loading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -165,8 +166,13 @@ class _State extends State<rembourssement> {
                               ),
                               SizedBox(
                                 width: 150,
-                                child: TextField(
+                                child: TextFormField(
                                   textAlign: TextAlign.center,
+                                  onChanged: (val){
+                                    setState(() {
+                                      remboursementModel.numero_facture = val;
+                                    });
+                                  },
                                 ),
                               ),
                             ],
@@ -187,8 +193,13 @@ class _State extends State<rembourssement> {
                               ),
                               SizedBox(
                                 width: 150,
-                                child: TextField(
+                                child: TextFormField(
                                   textAlign: TextAlign.center,
+                                  onChanged: (val){
+                                    setState(() {
+                                      remboursementModel.montant_rembourse = val ;
+                                    });
+                                  },
                                 ),
                               ),
                             ],
@@ -209,8 +220,13 @@ class _State extends State<rembourssement> {
                               ),
                               SizedBox(
                                 width: 150,
-                                child: TextField(
+                                child: TextFormField(
                                   textAlign: TextAlign.center,
+                                  onChanged: (val){
+                                    setState(() {
+                                      remboursementModel.montant_attendu = val ;
+                                    });
+                                  },
                                 ),
                               ),
                             ],
@@ -229,10 +245,15 @@ class _State extends State<rembourssement> {
                                       fontWeight: FontWeight.w300),
                                 ),
                               ),
-                              const SizedBox(
+                               SizedBox(
                                 width: 500,
-                                child: TextField(
+                                child: TextFormField(
                                   textAlign: TextAlign.center,
+                                  onChanged: (val){
+                                    setState(() {
+                                      remboursementModel.explication_preuve = val;
+                                    });
+                                  },
                                 ),
                               ),
                             ],
@@ -255,7 +276,21 @@ class _State extends State<rembourssement> {
                                 ),
                               ),
                               ElevatedButton(
-                                onPressed: _joindre,
+                                onPressed: () async {
+                                  final ImagePicker _picker =
+                                  ImagePicker();
+                                  try {
+                                    var file = await _picker.pickImage(
+                                        source: ImageSource.gallery,
+                                        imageQuality: 50);
+
+                                    if (file != null) {
+                                      setState(() {
+                                        remboursementModel.preuve = file;
+                                      });
+                                    }
+                                  } catch (e) {}
+                                },
                                 child: Text(
                                   'Charger le document',
                                   style: TextStyle(
@@ -289,8 +324,23 @@ class _State extends State<rembourssement> {
                         height: 100,
                       ),
                       ElevatedButton(
-                        onPressed: _envoyer,
-                        child: Text('Envoyer',
+                        onPressed: () async {
+                          setState(() {
+                            loading = true;
+                          });
+
+
+
+                          ApiService apiService = ApiService();
+                          final url = await apiService
+                              .inscrireRemboursement(remboursementModel);
+
+
+                          setState(() {
+                            loading = false;
+                          });
+                        },
+                        child: loading ?const  Center(child: CircularProgressIndicator(),) : Text('Envoyer',
                             style: TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.w500,

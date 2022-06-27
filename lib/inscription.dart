@@ -3,9 +3,9 @@ import 'dart:html';
 import 'package:flutter/material.dart';
 import 'package:techme/connexion.dart';
 import 'package:techme/main.dart';
-import 'package:techme/reclamation.dart';
+import 'package:techme/screens/reclamation/reclamation.dart';
 import 'package:techme/assurance.dart';
-import 'package:techme/operateur.dart';
+import 'package:techme/screens/operateur/operateur.dart';
 //import 'dart:async';
 
 //Color(0xFF4695CD)
@@ -61,7 +61,7 @@ class _State extends State<inscription> {
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => reclamation()),
+                    MaterialPageRoute(builder: (context) => Reclamation()),
                   );
                 },
                 child: Text('Réclamaton',

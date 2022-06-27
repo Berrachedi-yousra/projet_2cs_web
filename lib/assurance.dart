@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:techme/connexion.dart';
 import 'package:techme/main.dart';
 import 'package:techme/models/assure.dart';
-import 'package:techme/reclamation.dart';
+import 'package:techme/screens/reclamation/reclamation.dart';
 import 'package:techme/inscription.dart';
 import 'package:techme/services/api_service.dart';
 
@@ -76,7 +76,7 @@ class _State extends State<Assurance> {
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => reclamation()),
+                    MaterialPageRoute(builder: (context) => Reclamation()),
                   );
                 },
                 child: const Text('Réclamaton',

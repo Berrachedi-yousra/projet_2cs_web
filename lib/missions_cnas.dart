@@ -1,11 +1,11 @@
-import 'dart:html';
 import 'package:flutter/material.dart';
 import 'package:techme/acceuil_cnas.dart';
 import 'package:techme/tb.dart';
-import 'package:techme/reclamation_cnas.dart';
 import 'package:techme/control.dart';
-import 'package:techme/op.dart';
+import 'package:techme/screens/operateur/operateurs_screen.dart';
 import 'package:techme/facture_cnas.dart';
+
+import 'screens/reclamation/reclamations_cnas_screen.dart';
 
 //import 'dart:async';
 
@@ -57,7 +57,7 @@ class _State extends State<missions_cnas> {
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => op()),
+                    MaterialPageRoute(builder: (context) => OperateursScreen()),
                   );
                 },
                 child: Text('Opérateurs',
@@ -70,7 +70,7 @@ class _State extends State<missions_cnas> {
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => control()),
+                    MaterialPageRoute(builder: (context) => ControlScreen()),
                   );
                 },
                 child: Text('Control',
@@ -83,7 +83,7 @@ class _State extends State<missions_cnas> {
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => reclamation_cnas()),
+                    MaterialPageRoute(builder: (context) => ReclamationCnasScreen()),
                   );
                 },
                 child: Text('Réclamations',
