@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http_parser/http_parser.dart';
 import 'package:techme/models/assure.dart';
+import 'package:techme/models/control.dart';
 import 'package:techme/models/facture.dart';
 import 'package:techme/models/operaeur.dart';
 import 'package:techme/models/reclamation.dart';
@@ -11,6 +12,9 @@ import 'package:techme/models/transportateur.dart';
 
 import '../config/api.dart';
 import 'package:http/http.dart' as http;
+
+import '../models/mission.dart';
+import 'localstorage.dart';
 
 class ApiService {
   Future inscrireOperateur(OperateurModel operateurModel) async {
@@ -110,7 +114,7 @@ class ApiService {
         await remboursementModel.preuve!.length(),
         filename: remboursementModel.preuve!.name,
         contentType:
-        MediaType('image', remboursementModel.preuve!.name.split(".")[1]),
+            MediaType('image', remboursementModel.preuve!.name.split(".")[1]),
       ),
     );
 
@@ -128,12 +132,9 @@ class ApiService {
       "montant_rembourse": remboursementModel.montant_rembourse ?? "0",
       "montant_attendu": remboursementModel.montant_attendu ?? '0',
       "explication_preuve": remboursementModel.explication_preuve ?? "x",
-
-
     });
 
     try {
-      print(request.fields);
       var response = await request.send();
       var data = await response.stream.bytesToString();
 
@@ -153,19 +154,76 @@ class ApiService {
     }
   }
 
+
+  Future inscrireTransportateur(TransportateurModel transportateurModel) async {
+    final url = apiUrl + "admin/transportateurForm";
+
+    var request = http.MultipartRequest(
+      'POST',
+      Uri.parse(url),
+    );
+
+    request.files.add(
+      http.MultipartFile(
+        'photo_transportateur',
+        transportateurModel.photo_transportateur_file!.readAsBytes().asStream(),
+        await transportateurModel.photo_transportateur_file!.length(),
+        filename: transportateurModel.photo_transportateur_file!.name,
+        contentType:
+        MediaType('image', transportateurModel.photo_transportateur_file!.name.split(".")[1]),
+      ),
+    );
+
+    final headers = {
+      "Content-Type": "multipart/form-data",
+      "Access-Control-Allow-Origin": "*"
+    };
+
+    request.headers.addAll(headers);
+
+    print(transportateurModel.toString());
+
+    request.fields.addAll({
+      "nom": transportateurModel.nom ?? "",
+      "prenom": transportateurModel.prenom ?? "",
+      "date_recrutement": transportateurModel.date_recrutement ?? '',
+      "type_vehicule": transportateurModel.type_vehicule ?? "",
+      "id_operateur": transportateurModel.id_operateur ?? "3",
+      "email": transportateurModel.email ?? "",
+      "mot_de_passe_transportateur": transportateurModel.mot_de_passe_transportateur ?? "",
+
+    });
+
+    try {
+      var response = await request.send();
+      var data = await response.stream.bytesToString();
+
+      print(response.statusCode);
+      if (response.statusCode == 200) {
+        print(data);
+        print('transportateur inscrit');
+
+        //notifyListeners();
+      } else {
+        print('error');
+
+        throw Error();
+      }
+    } catch (e) {
+      throw e;
+    }
+  }
+
+
   Future inscrireAssure(AssureModel assureModel) async {
     final url = apiUrl + "newAssure";
-
-
 
     final headers = {
       "Content-Type": "application/json",
       "Access-Control-Allow-Origin": "*"
     };
 
-
-
-   final body = {
+    final body = {
       "nss": assureModel.nss ?? "",
       "nom": assureModel.nom ?? "",
       "date_naissance": assureModel.date_naissance ?? '2000-11-17',
@@ -184,14 +242,9 @@ class ApiService {
       "nom_epoux": assureModel.nom_epoux ?? "",
     };
 
-
-
-
     try {
-
       final response = await http.post(Uri.parse(url),
           headers: headers, body: jsonEncode(body));
-
 
       print(response.statusCode);
       if (response.statusCode == 200) {
@@ -208,20 +261,53 @@ class ApiService {
     }
   }
 
-  Future inscrireReclamation(ReclamationModel reclamationModel,String type) async {
-    final url = apiUrl + "newReclamation";
-
-
+  Future inscrireControl(ControlModel controlModel) async {
+    final url = apiUrl + "admin/newControl";
 
     final headers = {
       "Content-Type": "application/json",
       "Access-Control-Allow-Origin": "*"
     };
 
+    final body = {
+      "raison_social_operateur": controlModel.raison_social_operateur ?? "",
+      "nom_controleur1": controlModel.nom_controleur1 ?? "",
+      "nom_controleur2": controlModel.nom_controleur2 ?? '',
+      "prenom_cotroleur1": controlModel.prenom_cotroleur1 ?? "",
+      "prenom_cotroleur2": controlModel.prenom_cotroleur2 ?? "",
+      "date_controle": controlModel.date_controle ?? "2000-11-17",
+      "heure_controle": controlModel.heure_controle ?? "",
+    };
 
+    try {
+      final response = await http.post(Uri.parse(url),
+          headers: headers, body: jsonEncode(body));
+
+      print(response.statusCode);
+      if (response.statusCode == 200) {
+        print('control inscrit');
+
+        //notifyListeners();
+      } else {
+        print('error');
+
+        throw Error();
+      }
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  Future inscrireReclamation(
+      ReclamationModel reclamationModel, String type) async {
+    final url = apiUrl + "newReclamation";
+
+    final headers = {
+      "Content-Type": "application/json",
+      "Access-Control-Allow-Origin": "*"
+    };
 
     final body = {
-
       "type_reclammation": type,
       "matricule": reclamationModel.matricule,
       "nom": reclamationModel.nom,
@@ -235,18 +321,57 @@ class ApiService {
       "post_emetteur": reclamationModel.post_emetteur,
       "reclamation_sur": reclamationModel.reclamation_sur,
       "date_accident": reclamationModel.date_accident,
-      "date_reclamation":reclamationModel.date_reclamation,
+      "date_reclamation": reclamationModel.date_reclamation,
       "contenu_reclamation": reclamationModel.contenu_reclamation,
     };
 
-
-
-
     try {
-
       final response = await http.post(Uri.parse(url),
           headers: headers, body: jsonEncode(body));
 
+      print(response.statusCode);
+      if (response.statusCode == 200) {
+        print('reclamation inscrit');
+
+        //notifyListeners();
+      } else {
+        print('error');
+
+        throw Error();
+      }
+    } catch (e) {
+      throw e;
+    }
+  }
+
+
+  Future inscrireMission(
+      MissionModel missionModel) async {
+    final url = apiUrl + "admin/missionsForm";
+
+    final headers = {
+      "Content-Type": "application/json",
+      "Access-Control-Allow-Origin": "*"
+    };
+
+    final body = {
+      "nom_patient": missionModel.nom_patient,
+      "prenom_patient": missionModel.prenom_patient,
+      "date_mission": missionModel.date_mission,
+      "heure_depart": missionModel.heure_depart,
+      "adresse_depart": missionModel.adresse_depart,
+      "adresse_arrive": missionModel.adresse_arrive,
+      "nombre_patient": missionModel.nombre_patient,
+      "attente": missionModel.attente,
+      "temps_attente": missionModel.temps_attente,
+      "nom_transportateur": missionModel.nom_transportateur,
+      "prenom_transportateur": missionModel.prenom_transportateur,
+
+    };
+
+    try {
+      final response = await http.post(Uri.parse(url),
+          headers: headers, body: jsonEncode(body));
 
       print(response.statusCode);
       if (response.statusCode == 200) {
@@ -278,7 +403,7 @@ class ApiService {
         await factureModel.capture_ecran!.length(),
         filename: factureModel.capture_ecran!.name,
         contentType:
-        MediaType('image', factureModel.capture_ecran!.name.split(".")[1]),
+            MediaType('image', factureModel.capture_ecran!.name.split(".")[1]),
       ),
     );
     request.files.add(
@@ -287,8 +412,8 @@ class ApiService {
         factureModel.attestation_medical!.readAsBytes().asStream(),
         await factureModel.attestation_medical!.length(),
         filename: factureModel.attestation_medical!.name,
-        contentType:
-        MediaType('image', factureModel.attestation_medical!.name.split(".")[1]),
+        contentType: MediaType(
+            'image', factureModel.attestation_medical!.name.split(".")[1]),
       ),
     );
     request.files.add(
@@ -297,8 +422,8 @@ class ApiService {
         factureModel.certificat_soin!.readAsBytes().asStream(),
         await factureModel.certificat_soin!.length(),
         filename: factureModel.certificat_soin!.name,
-        contentType:
-        MediaType('image', factureModel.certificat_soin!.name.split(".")[1]),
+        contentType: MediaType(
+            'image', factureModel.certificat_soin!.name.split(".")[1]),
       ),
     );
 
@@ -312,7 +437,7 @@ class ApiService {
     print(factureModel.toString());
 
     request.fields.addAll({
-     // "num": factureModel.num ?? "d",
+      // "num": factureModel.num ?? "d",
       "date_mission": factureModel.date_mission ?? "d",
       "heure_depart": factureModel.heure_depart ?? "d",
       "heure_arrive": factureModel.heure_arrive ?? "d",
@@ -376,7 +501,35 @@ class ApiService {
     }
   }
 
-  Future<TransportateursModel> getOperateursAllTransportateur(String idOperateur) async {
+  Future<MissionsModel> getAllMissions() async {
+    String url = apiUrl + "admin/allmissions";
+    print(url);
+
+    try {
+      final response = await http.get(
+        Uri.parse(url),
+        /* headers: {
+          //"Content-Type": "application/json",
+        },*/
+      );
+      if (response.statusCode == 200) {
+        List<dynamic> userData = json.decode(response.body);
+        MissionsModel missionsModel = MissionsModel.fromJson(userData);
+        return missionsModel;
+      } else {
+        final userData = json.decode(response.body);
+
+        print(userData);
+        print('xxx');
+        throw Error();
+      }
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  Future<TransportateursModel> getOperateursAllTransportateur(
+      String idOperateur) async {
     String url = apiUrl + "operateurs/${idOperateur}/transportateurs";
     print(url);
 
@@ -389,7 +542,8 @@ class ApiService {
       );
       if (response.statusCode == 200) {
         List<dynamic> userData = json.decode(response.body);
-        TransportateursModel transportateursModel = TransportateursModel.fromJson(userData);
+        TransportateursModel transportateursModel =
+            TransportateursModel.fromJson(userData);
         return transportateursModel;
       } else {
         final userData = json.decode(response.body);
@@ -403,6 +557,35 @@ class ApiService {
     }
   }
 
+
+  Future<ControlsModel> getControlsByOperateur(
+      String idOperateur) async {
+    String url = apiUrl + "admin/getControlsByOperator/${idOperateur}";
+    print(url);
+
+    try {
+      final response = await http.get(
+        Uri.parse(url),
+        /* headers: {
+          //"Content-Type": "application/json",
+        },*/
+      );
+      if (response.statusCode == 200) {
+        List<dynamic> userData = json.decode(response.body);
+        ControlsModel controlsModel =
+        ControlsModel.fromJson(userData);
+        return controlsModel;
+      } else {
+        final userData = json.decode(response.body);
+
+        print(userData);
+        print('xxx');
+        throw Error();
+      }
+    } catch (e) {
+      throw e;
+    }
+  }
 
 
   Future<ReclamationsModel> getAllReclamations() async {
@@ -418,24 +601,62 @@ class ApiService {
       );
 
       if (response.statusCode == 200) {
-
-
         List<dynamic> userData = json.decode(response.body);
         print(userData.length);
-        ReclamationsModel reclamationsModel = ReclamationsModel.fromJson(userData);
+        ReclamationsModel reclamationsModel =
+            ReclamationsModel.fromJson(userData);
         return reclamationsModel;
       } else {
-
         final userData = json.decode(response.body);
 
         print(userData);
         throw Error();
       }
     } catch (e) {
-
       throw e;
     }
   }
+
+  Future login(String? email, String? password,String typeConnexion) async {
+    final url = typeConnexion=='cnas' ? apiUrl + "cnasConnexion" : apiUrl + "operateurConnexion";
+    final headers = {
+      "Content-Type": "application/json",
+    };
+    final body = {
+      "username": email,
+      "password": password,
+    };
+
+    try {
+      final response = await http.post(Uri.parse(url),
+          headers: headers, body: jsonEncode(body));
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        print(data);
+
+        await LocalStorage.saveUser(
+            data["acessToken"].toString(), data["idOperateur"].toString());
+/*
+        _isAuth = true;
+        _token = data["acessToken"];
+        _transportateur = Transportateur();
+        _transportateur!.idTransportateur = data["idTransportateur"];
+        await LocalStorage.saveUser(
+            _token, data["idTransportateur"].toString(), data["acessToken"]);
+        notifyListeners();*/
+      } else {
+        final data = jsonDecode(response.body);
+      /*  _transportateur = Transportateur();
+        _transportateur = Transportateur.fromJson(data);*/
+
+        throw Error();
+      }
+    } catch (e) {
+      print("login error");
+      throw e;
+    }
+  }
+
 
 /*
 

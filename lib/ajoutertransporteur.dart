@@ -1,26 +1,54 @@
 import 'dart:html';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:techme/facture.dart';
 import 'package:techme/missions.dart';
 import 'package:techme/acceuil_op.dart';
+import 'package:techme/models/transportateur.dart';
 import 'package:techme/rembourssement.dart';
+import 'package:techme/services/api_service.dart';
 import 'package:techme/transporteurs.dart';
 
 //import 'dart:async';
 
-void main() {
-  runApp(MaterialApp(
-      debugShowCheckedModeBanner: false, home: ajoutertransporteur()));
-}
 
 class ajoutertransporteur extends StatefulWidget {
+
+
+
+  ajoutertransporteur({this.operateurId,Key? key}) : super(key: key);
+  String? operateurId;
   @override
   _State createState() => _State();
 }
 
 class _State extends State<ajoutertransporteur> {
-  void _confirmer() {}
-  void _charger_photo() {}
+
+
+  ApiService apiService = ApiService();
+  TransportateurModel transportateurModel = TransportateurModel();
+
+  bool loading = false;
+
+  DateTime dateRecrutement = DateTime.now();
+
+
+
+
+
+  Future<void> _selectDateRecrutement(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+        context: context,
+        initialDate: dateRecrutement,
+        firstDate: DateTime(1920, 8),
+        lastDate: DateTime(2050));
+    if (picked != null && picked != dateRecrutement) {
+      setState(() {
+        dateRecrutement = picked;
+      });
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -162,7 +190,7 @@ class _State extends State<ajoutertransporteur> {
                             border: Border.all(
                                 color: Color.fromARGB(255, 185, 185, 185))),
                         width: 800,
-                        height: 300,
+
                         child: Column(children: [
                           const SizedBox(
                             height: 30,
@@ -183,8 +211,13 @@ class _State extends State<ajoutertransporteur> {
                               ),
                               SizedBox(
                                 width: 500,
-                                child: TextField(
+                                child: TextFormField(
                                   textAlign: TextAlign.center,
+                                  onChanged: (val){
+                                    setState(() {
+                                      transportateurModel.nom = val;
+                                    });
+                                  },
                                 ),
                               ),
                             ],
@@ -205,12 +238,18 @@ class _State extends State<ajoutertransporteur> {
                               ),
                               SizedBox(
                                 width: 500,
-                                child: TextField(
+                                child:TextFormField(
                                   textAlign: TextAlign.center,
+                                  onChanged: (val){
+                                    setState(() {
+                                      transportateurModel.prenom = val;
+                                    });
+                                  },
                                 ),
                               ),
                             ],
                           ),
+                          const SizedBox(height: 10,),
                           Row(
                             children: [
                               SizedBox(
@@ -227,8 +266,81 @@ class _State extends State<ajoutertransporteur> {
                               ),
                               SizedBox(
                                 width: 500,
-                                child: TextField(
+                                child:  ElevatedButton(
+                                  onPressed: ()async{
+                                    await _selectDateRecrutement(context);
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    primary: Colors.orange,
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 40, vertical: 10),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius:
+                                      BorderRadius.circular(20), // <-- Radius
+                                    ),
+                                  ),
+                                  child: Text(
+                                    "${dateRecrutement.toLocal()}".split(' ')[0],
+                                    style: const TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: 13),
+                                  ),
+
+                                ),
+                              ),
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              SizedBox(
+                                width: 60,
+                              ),
+                              SizedBox(
+                                width: 180,
+                                child: Text(
+                                  'Email',
+                                  style: TextStyle(
+                                      color: Color.fromARGB(255, 120, 120, 120),
+                                      fontWeight: FontWeight.w300),
+                                ),
+                              ),
+                              SizedBox(
+                                width: 500,
+                                child: TextFormField(
                                   textAlign: TextAlign.center,
+                                  onChanged: (val){
+                                    setState(() {
+                                      transportateurModel.email = val;
+                                    });
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              SizedBox(
+                                width: 60,
+                              ),
+                              SizedBox(
+                                width: 180,
+                                child: Text(
+                                  'Mot de passe',
+                                  style: TextStyle(
+                                      color: Color.fromARGB(255, 120, 120, 120),
+                                      fontWeight: FontWeight.w300),
+                                ),
+                              ),
+                              SizedBox(
+                                width: 500,
+                                child: TextFormField(
+                                  textAlign: TextAlign.center,
+                                  onChanged: (val){
+                                    setState(() {
+                                      transportateurModel.mot_de_passe_transportateur = val;
+                                    });
+                                  },
                                 ),
                               ),
                             ],
@@ -249,8 +361,13 @@ class _State extends State<ajoutertransporteur> {
                               ),
                               SizedBox(
                                 width: 150,
-                                child: TextField(
+                                child: TextFormField(
                                   textAlign: TextAlign.center,
+                                  onChanged: (val){
+                                    setState(() {
+                                      transportateurModel.type_vehicule = val;
+                                    });
+                                  },
                                 ),
                               ),
                             ],
@@ -273,7 +390,20 @@ class _State extends State<ajoutertransporteur> {
                                 width: 50,
                               ),
                               IconButton(
-                                onPressed: _charger_photo,
+                                onPressed:()async {
+                                  final ImagePicker _picker = ImagePicker();
+                                  try {
+                                    var file = await _picker.pickImage(
+                                        source: ImageSource.gallery,
+                                        imageQuality: 50);
+
+                                    if (file != null) {
+                                      setState(() {
+                                        transportateurModel.photo_transportateur_file = file;
+                                      });
+                                    }
+                                  } catch (e) {}
+                                },
                                 icon: Image.asset('images/camera.png'),
                                 iconSize: 30,
                               ),
@@ -281,8 +411,27 @@ class _State extends State<ajoutertransporteur> {
                                 width: 325,
                               ),
                               ElevatedButton(
-                                onPressed: _confirmer,
-                                child: const Text(
+                                onPressed: () async {
+                                  setState(() {
+                                    loading = true;
+                                  });
+
+                                  transportateurModel.date_recrutement =  dateRecrutement.toString();
+                                  transportateurModel.id_operateur = widget.operateurId;
+
+
+
+                                  final url = await apiService
+                                      .inscrireTransportateur(transportateurModel);
+
+                                  /*  var data = await apiService
+                          .getAllOperateurs();
+                      print(data);*/
+                                  setState(() {
+                                    loading = false;
+                                  });
+                                },
+                                child: loading ? const CircularProgressIndicator() :const  Text(
                                   'Confirmer',
                                   style: TextStyle(
                                       color: Colors.white,
@@ -300,6 +449,9 @@ class _State extends State<ajoutertransporteur> {
                                 ),
                               ),
                             ],
+                          ),
+                          const SizedBox(
+                            height: 30,
                           ),
                         ]),
                       ),

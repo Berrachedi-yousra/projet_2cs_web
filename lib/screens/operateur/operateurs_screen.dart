@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:techme/acceuil_cnas.dart';
+import 'package:techme/liste_controles.dart';
+import 'package:techme/mission_detail_screen.dart';
 import 'package:techme/missions_cnas.dart';
+import 'package:techme/missions_operateur_cnas.dart';
 import 'package:techme/models/operaeur.dart';
 import 'package:techme/services/api_service.dart';
 import 'package:techme/tb.dart';
@@ -12,7 +15,6 @@ import 'OperateurDetails.dart';
 
 //import 'dart:async';
 
-
 class OperateursScreen extends StatefulWidget {
   const OperateursScreen({Key? key}) : super(key: key);
 
@@ -21,7 +23,6 @@ class OperateursScreen extends StatefulWidget {
 }
 
 class _State extends State<OperateursScreen> {
-
   ApiService apiService = ApiService();
   bool isLoading = true;
   OperateursModel operateursModel = OperateursModel();
@@ -56,8 +57,7 @@ class _State extends State<OperateursScreen> {
 
   @override
   Widget build(BuildContext context) {
-
-   return Scaffold(
+    return Scaffold(
       appBar: AppBar(
         actions: [
           Row(
@@ -66,15 +66,13 @@ class _State extends State<OperateursScreen> {
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(
-                        builder: (context) => acceuil_cnas()),
+                    MaterialPageRoute(builder: (context) => acceuil_cnas()),
                   );
                 },
-                child: const  Text('Acceuil',
-                    style: TextStyle(
-                        color: Colors.white, fontSize: 17)),
+                child: const Text('Acceuil',
+                    style: TextStyle(color: Colors.white, fontSize: 17)),
               ),
-              const   SizedBox(
+              const SizedBox(
                 width: 15,
                 height: 10,
               ),
@@ -86,24 +84,9 @@ class _State extends State<OperateursScreen> {
                   );
                 },
                 child: const Text('Tableau de bord',
-                    style: TextStyle(
-                        color: Colors.white, fontSize: 17)),
+                    style: TextStyle(color: Colors.white, fontSize: 17)),
               ),
-              const  SizedBox(
-                width: 15,
-              ),
-              OutlinedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) =>  const OperateursScreen()),
-                  );
-                },
-                child: const  Text('Opérateurs',
-                    style: TextStyle(
-                        color: Colors.white, fontSize: 17)),
-              ),
-              const   SizedBox(
+              const SizedBox(
                 width: 15,
               ),
               OutlinedButton(
@@ -111,14 +94,26 @@ class _State extends State<OperateursScreen> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => ControlScreen()),
+                        builder: (context) => const OperateursScreen()),
                   );
                 },
-                child:  const Text('Control',
-                    style: TextStyle(
-                        color: Colors.white, fontSize: 17)),
+                child: const Text('Opérateurs',
+                    style: TextStyle(color: Colors.white, fontSize: 17)),
               ),
-              const    SizedBox(
+              const SizedBox(
+                width: 15,
+              ),
+              OutlinedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => ControlScreen()),
+                  );
+                },
+                child: const Text('Control',
+                    style: TextStyle(color: Colors.white, fontSize: 17)),
+              ),
+              const SizedBox(
                 width: 15,
               ),
               OutlinedButton(
@@ -129,17 +124,16 @@ class _State extends State<OperateursScreen> {
                         builder: (context) => ReclamationCnasScreen()),
                   );
                 },
-                child:  const Text('Réclamations',
-                    style: TextStyle(
-                        color: Colors.white, fontSize: 17)),
+                child: const Text('Réclamations',
+                    style: TextStyle(color: Colors.white, fontSize: 17)),
               ),
-              const    SizedBox(
+              const SizedBox(
                 width: 30,
               ),
             ],
           )
         ],
-        backgroundColor:  const Color(0xFF4695CD),
+        backgroundColor: const Color(0xFF4695CD),
         shadowColor: Colors.transparent,
       ),
       body: Stack(
@@ -177,140 +171,194 @@ class _State extends State<OperateursScreen> {
                     ],
                   ),
 
-            FutureBuilder<OperateursModel>(
-                future: apiService.getAllOperateurs(),
-                builder: (
-                BuildContext context,
-                AsyncSnapshot<OperateursModel> snapshot,
-                ) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(child: CircularProgressIndicator());
-              } else if (snapshot.connectionState == ConnectionState.done) {
-                if (snapshot.hasError) {
-                  return const Text('Error');
-                } else if (snapshot.hasData) {
-                  print("${snapshot.data!.operateurs!.length} xx");
-                  return  Expanded(
-                    child: ListView.builder(
-                      itemCount: snapshot.data!.operateurs!.length,
-                      itemBuilder: (context, index) {
-                        return  Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 15),
-                          child: Row(
-                            children: [
-                              const SizedBox(
-                                width: 220,
-                              ),
-                              Container(
-                                decoration: BoxDecoration(
-                                    borderRadius:
-                                    BorderRadius.circular(30),
-                                    border: Border.all(
-                                        color: const Color.fromARGB(
-                                            255, 185, 185, 185))),
-                                width: 910,
-                                height: 50,
-                                child: Row(children: [
-                                  const SizedBox(
-                                    width: 60,
-                                  ),
-                                   Text(
-                                    '${snapshot.data!.operateurs![index].raison_social}',
-                                    style:const  TextStyle(
-                                        color: Color.fromARGB(
-                                            255, 120, 120, 120),
-                                        fontWeight: FontWeight.w300),
-                                  ),
-                                  const SizedBox(
-                                    width: 50,
-                                  ),
-                                   Text( '${snapshot.data!.operateurs![index].siege_social}'),
-                                  Spacer(),
-                                  ElevatedButton(
-                                    onPressed: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                missions_cnas()),
-                                      );
-                                    },
-                                    style: ElevatedButton.styleFrom(
-                                      primary:  const Color(0xFF4695CD),
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 30, vertical: 15),
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                        BorderRadius.circular(
-                                            20), // <-- Radius
-                                      ),
+                  FutureBuilder<OperateursModel>(
+                      future: apiService.getAllOperateurs(),
+                      builder: (
+                        BuildContext context,
+                        AsyncSnapshot<OperateursModel> snapshot,
+                      ) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return const Center(
+                              child: CircularProgressIndicator());
+                        } else if (snapshot.connectionState ==
+                            ConnectionState.done) {
+                          if (snapshot.hasError) {
+                            return const Text('Error');
+                          } else if (snapshot.hasData) {
+                            print("${snapshot.data!.operateurs!.length} xx");
+                            return Expanded(
+                              child: ListView.builder(
+                                itemCount: snapshot.data!.operateurs!.length,
+                                itemBuilder: (context, index) {
+                                  return Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 15),
+                                    child: Row(
+                                      children: [
+                                        const SizedBox(
+                                          width: 220,
+                                        ),
+                                        Container(
+                                          decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(30),
+                                              border: Border.all(
+                                                  color: const Color.fromARGB(
+                                                      255, 185, 185, 185))),
+                                          width: 910,
+                                          height: 50,
+                                          child: Row(children: [
+                                            const SizedBox(
+                                              width: 60,
+                                            ),
+                                            Text(
+                                              '${snapshot.data!.operateurs![index].raison_social}',
+                                              style: const TextStyle(
+                                                  color: Color.fromARGB(
+                                                      255, 120, 120, 120),
+                                                  fontWeight: FontWeight.w300),
+                                            ),
+                                            const SizedBox(
+                                              width: 50,
+                                            ),
+                                            Text(
+                                                '${snapshot.data!.operateurs![index].siege_social}'),
+                                            Spacer(),
+                                            ElevatedButton(
+                                              onPressed: () {
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          ListControlsScreen(
+                                                            idOperateur: snapshot
+                                                                .data!
+                                                                .operateurs![
+                                                            index]
+                                                                .idoperateur,
+                                                          )),
+                                                );
+                                              },
+                                              style: ElevatedButton.styleFrom(
+                                                primary:
+                                                const Color(0xFF4695CD),
+                                                padding:
+                                                const EdgeInsets.symmetric(
+                                                    horizontal: 30,
+                                                    vertical: 15),
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                  BorderRadius.circular(
+                                                      20), // <-- Radius
+                                                ),
+                                              ),
+                                              child: const Text('Controle',
+                                                  style: TextStyle(
+                                                      color: Colors.white,
+                                                      fontWeight:
+                                                      FontWeight.w500,
+                                                      fontSize: 15)),
+                                            ),
+                                            const SizedBox(
+                                              width: 50,
+                                              height: 5,
+                                            ),
+                                            ElevatedButton(
+                                              onPressed: () {
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          MissionsOperateurCnas(
+                                                            idOperateur: snapshot
+                                                                .data!
+                                                                .operateurs![
+                                                                    index]
+                                                                .idoperateur,
+                                                          )),
+                                                );
+                                              },
+                                              style: ElevatedButton.styleFrom(
+                                                primary:
+                                                    const Color(0xFF4695CD),
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        horizontal: 30,
+                                                        vertical: 15),
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          20), // <-- Radius
+                                                ),
+                                              ),
+                                              child: const Text('Missions',
+                                                  style: TextStyle(
+                                                      color: Colors.white,
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                      fontSize: 15)),
+                                            ),
+                                            const SizedBox(
+                                              width: 50,
+                                              height: 5,
+                                            ),
+                                            ElevatedButton(
+                                              onPressed: () {
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          OperateurDetailsScreen(
+                                                            operateurModel: snapshot
+                                                                    .data!
+                                                                    .operateurs![
+                                                                index],
+                                                          )),
+                                                );
+                                              },
+                                              style: ElevatedButton.styleFrom(
+                                                primary: Colors.orange,
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        horizontal: 30,
+                                                        vertical: 15),
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          20), // <-- Radius
+                                                ),
+                                              ),
+                                              child: const Text('Details',
+                                                  style: TextStyle(
+                                                      color: Colors.white,
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                      fontSize: 15)),
+                                            ),
+                                            const SizedBox(
+                                              width: 60,
+                                            ),
+                                          ]),
+                                        ),
+                                      ],
                                     ),
-                                    child:  const Text('Missions',
-                                        style: TextStyle(
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.w500,
-                                            fontSize: 15)),
-
-                                  ),
-                                  const SizedBox(
-                                    width: 50,
-                                    height: 5,
-                                  ),
-                                  ElevatedButton(
-                                    onPressed: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                OperateurDetailsScreen(operateurModel: snapshot.data!.operateurs![index],)),
-                                      );
-                                    },
-                                    style: ElevatedButton.styleFrom(
-                                      primary: Colors.orange,
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 30, vertical: 15),
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                        BorderRadius.circular(
-                                            20), // <-- Radius
-                                      ),
-                                    ),
-                                    child:  const Text('Details',
-                                        style: TextStyle(
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.w500,
-                                            fontSize: 15)),
-
-                                  ),
-                                  const SizedBox(
-                                    width: 60,
-                                  ),
-                                ]),
+                                  );
+                                },
                               ),
-                            ],
-                          ),
-                        );
-                      },
-                    ),
-                  );
-                } else {
-                  return const Text('Empty data');
-                }
-              } else {
-                return Text('State: ${snapshot.connectionState}');
-              }
-                }),
-
-
-
-
+                            );
+                          } else {
+                            return const Text('Empty data');
+                          }
+                        } else {
+                          return Text('State: ${snapshot.connectionState}');
+                        }
+                      }),
                 ],
               )),
         ],
       ),
     );
-
-
   }
 }
 

@@ -1,11 +1,14 @@
 import 'dart:html';
 import 'package:flutter/material.dart';
 import 'package:techme/main.dart';
+import 'package:techme/services/api_service.dart';
 import 'package:techme/transporteurs.dart';
 import 'package:techme/facture.dart';
 import 'package:techme/rembourssement.dart';
 import 'package:techme/acceuil_op.dart';
 import 'package:techme/missions.dart';
+
+import 'models/mission.dart';
 
 //import 'dart:async';
 
@@ -21,6 +24,31 @@ class ajoutermission extends StatefulWidget {
 
 class _State extends State<ajoutermission> {
   void _confirmer() {}
+
+  ApiService apiService = ApiService();
+  MissionModel missionModel = MissionModel();
+
+  bool loading = false;
+  bool attente = false;
+
+  DateTime date_mission = DateTime.now();
+
+
+
+
+
+  Future<void> _selectDateMission(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+        context: context,
+        initialDate: date_mission,
+        firstDate: DateTime(1920, 8),
+        lastDate: DateTime(2050));
+    if (picked != null && picked != date_mission) {
+      setState(() {
+        date_mission = picked;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -161,7 +189,7 @@ class _State extends State<ajoutermission> {
                             border: Border.all(
                                 color: Color.fromARGB(255, 185, 185, 185))),
                         width: 800,
-                        height: 500,
+
                         child: Column(children: [
                           const SizedBox(
                             height: 30,
@@ -174,7 +202,7 @@ class _State extends State<ajoutermission> {
                               SizedBox(
                                 width: 180,
                                 child: Text(
-                                  'Nom complet du patient',
+                                  'Nom du patient',
                                   style: TextStyle(
                                       color: Color.fromARGB(255, 120, 120, 120),
                                       fontWeight: FontWeight.w300),
@@ -182,12 +210,45 @@ class _State extends State<ajoutermission> {
                               ),
                               SizedBox(
                                 width: 500,
-                                child: TextField(
+                                child: TextFormField(
                                   textAlign: TextAlign.center,
+                                  onChanged: (val){
+                                    setState(() {
+                                      missionModel.nom_patient = val;
+                                    });
+                                  },
                                 ),
                               ),
                             ],
                           ),
+                          Row(
+                            children: [
+                              SizedBox(
+                                width: 60,
+                              ),
+                              SizedBox(
+                                width: 180,
+                                child: Text(
+                                  'Prenom du patient',
+                                  style: TextStyle(
+                                      color: Color.fromARGB(255, 120, 120, 120),
+                                      fontWeight: FontWeight.w300),
+                                ),
+                              ),
+                              SizedBox(
+                                width: 500,
+                                child: TextFormField(
+                                  textAlign: TextAlign.center,
+                                  onChanged: (val){
+                                    setState(() {
+                                      missionModel.prenom_patient = val;
+                                    });
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 10,),
                           Row(
                             children: [
                               SizedBox(
@@ -204,8 +265,27 @@ class _State extends State<ajoutermission> {
                               ),
                               SizedBox(
                                 width: 150,
-                                child: TextField(
-                                  textAlign: TextAlign.center,
+                                child:  ElevatedButton(
+                                  onPressed: ()async{
+                                    await _selectDateMission(context);
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    primary: Colors.orange,
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 40, vertical: 10),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius:
+                                      BorderRadius.circular(20), // <-- Radius
+                                    ),
+                                  ),
+                                  child: Text(
+                                    "${date_mission.toLocal()}".split(' ')[0],
+                                    style: const TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: 13),
+                                  ),
+
                                 ),
                               ),
                             ],
@@ -226,8 +306,13 @@ class _State extends State<ajoutermission> {
                               ),
                               SizedBox(
                                 width: 150,
-                                child: TextField(
+                                child: TextFormField(
                                   textAlign: TextAlign.center,
+                                  onChanged: (val){
+                                    setState(() {
+                                      missionModel.heure_depart = val;
+                                    });
+                                  },
                                 ),
                               ),
                             ],
@@ -248,8 +333,13 @@ class _State extends State<ajoutermission> {
                               ),
                               SizedBox(
                                 width: 500,
-                                child: TextField(
+                                child: TextFormField(
                                   textAlign: TextAlign.center,
+                                  onChanged: (val){
+                                    setState(() {
+                                      missionModel.adresse_depart = val;
+                                    });
+                                  },
                                 ),
                               ),
                             ],
@@ -270,8 +360,13 @@ class _State extends State<ajoutermission> {
                               ),
                               SizedBox(
                                 width: 500,
-                                child: TextField(
+                                child: TextFormField(
                                   textAlign: TextAlign.center,
+                                  onChanged: (val){
+                                    setState(() {
+                                      missionModel.adresse_arrive = val;
+                                    });
+                                  },
                                 ),
                               ),
                             ],
@@ -292,8 +387,13 @@ class _State extends State<ajoutermission> {
                               ),
                               SizedBox(
                                 width: 150,
-                                child: TextField(
+                                child: TextFormField(
                                   textAlign: TextAlign.center,
+                                  onChanged: (val){
+                                    setState(() {
+                                      missionModel.nombre_patient = val;
+                                    });
+                                  },
                                 ),
                               ),
                             ],
@@ -314,8 +414,16 @@ class _State extends State<ajoutermission> {
                               ),
                               SizedBox(
                                 width: 150,
-                                child: TextField(
-                                  textAlign: TextAlign.center,
+                                child: Checkbox(
+                                  checkColor: Colors.white,
+                                  activeColor: Colors.orange,
+                                  value: attente,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      attente = value!;
+                                      missionModel.attente = attente.toString();
+                                    });
+                                  },
                                 ),
                               ),
                             ],
@@ -336,8 +444,13 @@ class _State extends State<ajoutermission> {
                               ),
                               SizedBox(
                                 width: 150,
-                                child: TextField(
+                                child: TextFormField(
                                   textAlign: TextAlign.center,
+                                  onChanged: (val){
+                                    setState(() {
+                                      missionModel.temps_attente = val;
+                                    });
+                                  },
                                 ),
                               ),
                             ],
@@ -350,7 +463,7 @@ class _State extends State<ajoutermission> {
                               SizedBox(
                                 width: 180,
                                 child: Text(
-                                  'Nom complet du transporteur',
+                                  'Nom du transporteur',
                                   style: TextStyle(
                                       color: Color.fromARGB(255, 120, 120, 120),
                                       fontWeight: FontWeight.w300),
@@ -358,8 +471,40 @@ class _State extends State<ajoutermission> {
                               ),
                               SizedBox(
                                 width: 150,
-                                child: TextField(
+                                child: TextFormField(
                                   textAlign: TextAlign.center,
+                                  onChanged: (val){
+                                    setState(() {
+                                      missionModel.nom_transportateur = val;
+                                    });
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              SizedBox(
+                                width: 60,
+                              ),
+                              SizedBox(
+                                width: 180,
+                                child: Text(
+                                  'Prenom du transporteur',
+                                  style: TextStyle(
+                                      color: Color.fromARGB(255, 120, 120, 120),
+                                      fontWeight: FontWeight.w300),
+                                ),
+                              ),
+                              SizedBox(
+                                width: 150,
+                                child: TextFormField(
+                                  textAlign: TextAlign.center,
+                                  onChanged: (val){
+                                    setState(() {
+                                      missionModel.prenom_transportateur = val;
+                                    });
+                                  },
                                 ),
                               ),
                             ],
@@ -378,8 +523,28 @@ class _State extends State<ajoutermission> {
                         height: 150,
                       ),
                       ElevatedButton(
-                        onPressed: _confirmer,
-                        child: Text('Confirmer',
+                        onPressed: () async {
+                          setState(() {
+                            loading = true;
+                          });
+
+                          missionModel.date_mission =  date_mission.toString();
+                          missionModel.attente = attente.toString();
+
+                          ApiService apiService = ApiService();
+                          final url = await apiService
+                              .inscrireMission(missionModel);
+
+                          /*  var data = await apiService
+                      .getAllOperateurs();
+                  print(data);*/
+                          setState(() {
+                            loading = false;
+                          });
+                        },
+                        child:loading
+                            ? const CircularProgressIndicator()
+                            : const  Text('Confirmer',
                             style: TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.w500,

@@ -9,9 +9,7 @@ import 'screens/reclamation/reclamations_cnas_screen.dart';
 
 //import 'dart:async';
 
-void main() {
-  runApp(MaterialApp(debugShowCheckedModeBanner: false, home: missions_cnas()));
-}
+
 
 class missions_cnas extends StatefulWidget {
   @override

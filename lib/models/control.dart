@@ -1,4 +1,4 @@
-/*class ControlsModel {
+class ControlsModel {
   ControlsModel({
     this.controls,
   });
@@ -24,30 +24,27 @@ class ControlModel {
   String? heure_controle;
 
   ControlModel({
-    this.id_operateur,
-    this.nom,
-    this.prenom,
-    this.date_recrutement,
-    this.type_vehicule,
-    this.idtransportateur,
-    this.photo_transportateur,
-    this.email,
-    this.mot_de_passe_transportateur,
+    this.numero_controle,
+    this.raison_social_operateur,
+    this.nom_controleur1,
+    this.nom_controleur2,
+    this.prenom_cotroleur1,
+    this.prenom_cotroleur2,
+    this.date_controle,
+    this.heure_controle,
   });
 
   factory ControlModel.fromJson(Map<String, dynamic> json) {
     return ControlModel(
-      id_operateur: json["id_operateur"].toString(),
-      nom: json["nom"],
-      prenom: json["prenom"],
-      date_recrutement: json["date_recrutement"].toString(),
-      type_vehicule: json["type_vehicule"],
-      idtransportateur: json["idtransportateur"].toString(),
-      photo_transportateur: json["photo_transportateur"],
-      email: json["email"],
-      mot_de_passe_transportateur: json["mot_de_passe_transportateur"],
+      numero_controle: json["numero_controle"].toString(),
+      raison_social_operateur: json["raison_social_operateur"],
+      nom_controleur1: json["nom_controleur1"],
+      nom_controleur2: json["nom_controleur2"],
+      prenom_cotroleur1: json["prenom_cotroleur1"],
+      prenom_cotroleur2: json["prenom_cotroleur2"],
+      date_controle: json["date_controle"].toString(),
+      heure_controle: json["heure_controle"],
 
     );
   }
 }
-*/

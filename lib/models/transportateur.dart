@@ -1,3 +1,5 @@
+import 'package:image_picker/image_picker.dart';
+
 class TransportateursModel {
   TransportateursModel({
     this.transportateur,
@@ -24,6 +26,8 @@ class TransportateurModel {
   String? email;
   String? mot_de_passe_transportateur;
 
+  XFile? photo_transportateur_file;
+
   TransportateurModel({
     this.id_operateur,
     this.nom,
@@ -34,6 +38,7 @@ class TransportateurModel {
     this.photo_transportateur,
     this.email,
     this.mot_de_passe_transportateur,
+    this.photo_transportateur_file,
   });
 
   factory TransportateurModel.fromJson(Map<String, dynamic> json) {
